@@ -1,10 +1,10 @@
 ﻿using System.Text.RegularExpressions;
-using BaseProject.Error;
+using SupportMe.Error;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Jpeg;
 using SixLabors.ImageSharp.Processing;
 
-namespace BaseProject.Helpers
+namespace SupportMe.Helpers
 {
     public static class ImageHelper
     {

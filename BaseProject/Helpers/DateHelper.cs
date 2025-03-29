@@ -1,4 +1,4 @@
-﻿namespace BaseProject.Helpers
+﻿namespace SupportMe.Helpers
 {
     public static class DateHelper
     {

@@ -1,7 +1,7 @@
 ﻿using StackExchange.Redis;
 using System.Text;
 
-namespace BaseProject.Services.Cache
+namespace SupportMe.Services.Cache
 {
     public class RedisService: ICacheService
     {

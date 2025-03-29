@@ -1,7 +1,7 @@
-﻿using BaseProject.DTOs;
-using BaseProject.Models.Enums;
+﻿using SupportMe.DTOs;
+using SupportMe.Models.Enums;
 
-namespace BaseProject.Helpers
+namespace SupportMe.Helpers
 {
     public static class SortingHelper
     {

@@ -1,4 +1,4 @@
-﻿namespace BaseProject.DTOs.FileUploadDTOs
+﻿namespace SupportMe.DTOs.FileUploadDTOs
 {
     public class S3Config
     {

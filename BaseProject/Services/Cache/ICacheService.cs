@@ -1,4 +1,4 @@
-﻿namespace BaseProject.Services.Cache
+﻿namespace SupportMe.Services.Cache
 {
     public interface ICacheService
     {

@@ -1,7 +1,7 @@
 ﻿using FirebaseAdmin.Auth;
 using FirebaseAdmin.Messaging;
 
-namespace BaseProject.Helpers
+namespace SupportMe.Helpers
 {
     public interface IFirebaseHandler
     {

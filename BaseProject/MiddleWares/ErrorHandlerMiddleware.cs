@@ -1,8 +1,8 @@
-﻿using BaseProject.Error;
+﻿using SupportMe.Error;
 using System.Net;
 using System.Text.Json;
 
-namespace BaseProject.MiddleWares
+namespace SupportMe.MiddleWares
 {
     public class ErrorHandlerMiddleware
     {

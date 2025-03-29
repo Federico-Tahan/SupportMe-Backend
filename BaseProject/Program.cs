@@ -1,6 +1,6 @@
 
-using BaseProject.Data;
-using BaseProject.Helpers;
+using SupportMe.Data;
+using SupportMe.Helpers;
 using FirebaseAdmin.Auth;
 using FirebaseAdmin.Messaging;
 using FirebaseAdmin;
@@ -8,15 +8,16 @@ using Google.Apis.Auth.OAuth2;
 using Microsoft.EntityFrameworkCore;
 using System.Text;
 using Amazon.Util;
-using BaseProject.DTOs.FileUploadDTOs;
+using SupportMe.DTOs.FileUploadDTOs;
 using Amazon.S3;
-using BaseProject.Services;
+using SupportMe.Services;
 using Amazon;
-using BaseProject.MiddleWares;
+using SupportMe.MiddleWares;
 using NLog.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Cryptography;
+using SupportMe.Services.Auth;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -56,21 +57,21 @@ builder.Services.AddSwaggerGen(options =>
 
 builder.Services.AddLogging(x => x.AddNLog());
 
-builder.Services.AddAutoMapper(typeof(BaseProject.Helpers.AutoMapper.AutoMapper));
+builder.Services.AddAutoMapper(typeof(SupportMe.Helpers.AutoMapper.AutoMapper));
 
 var connectionString = builder.Configuration.GetConnectionString("DB_CONNECTION");
 builder.Services.AddDbContext<DataContext>(x => x.UseSqlServer(connectionString));
 
-//builder.Services.AddSingleton(provider =>
-//{
-//    var byteArray = Encoding.UTF8.GetBytes(builder.Configuration.GetValue<string>("Firebase:Json"));
-//    using var stream = new MemoryStream(byteArray);
-//    var app = FirebaseApp.Create(new AppOptions
-//    {
-//        Credential = GoogleCredential.FromStream(stream)
-//    });
-//    return new FirebaseHandler(FirebaseAuth.GetAuth(app), FirebaseMessaging.GetMessaging(app));
-//});
+builder.Services.AddSingleton(provider =>
+{
+    var byteArray = Encoding.UTF8.GetBytes(builder.Configuration.GetValue<string>("Firebase:Json"));
+    using var stream = new MemoryStream(byteArray);
+    var app = FirebaseApp.Create(new AppOptions
+    {
+        Credential = GoogleCredential.FromStream(stream)
+    });
+    return new FirebaseHandler(FirebaseAuth.GetAuth(app), FirebaseMessaging.GetMessaging(app));
+});
 
 //var s3Config = new S3Config
 //{
@@ -127,6 +128,8 @@ builder.Services.AddCors(options =>
 /* ################    SERVICES     ################## */
 /* ################################################### */
 
+builder.Services.AddScoped<FirebaseAuthService>();
+builder.Services.AddScoped<UserService>();
 
 /* ################################################### */
 /* ################################################### */

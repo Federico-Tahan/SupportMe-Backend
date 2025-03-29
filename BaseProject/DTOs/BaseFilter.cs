@@ -1,6 +1,6 @@
-﻿using BaseProject.Models.Enums;
+﻿using SupportMe.Models.Enums;
 
-namespace BaseProject.DTOs
+namespace SupportMe.DTOs
 {
     public class BaseFilter
     {

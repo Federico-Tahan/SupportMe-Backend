@@ -1,6 +1,6 @@
 ﻿using System.Globalization;
 
-namespace BaseProject.Error
+namespace SupportMe.Error
 {
     public class AppException : Exception
     {

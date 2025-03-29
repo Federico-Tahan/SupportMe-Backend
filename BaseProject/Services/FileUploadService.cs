@@ -4,9 +4,9 @@ using Amazon.S3.Util;
 using System.Net;
 using Amazon.S3.Transfer;
 using System.Text.RegularExpressions;
-using BaseProject.DTOs.FileUploadDTOs;
+using SupportMe.DTOs.FileUploadDTOs;
 
-namespace BaseProject.Services
+namespace SupportMe.Services
 {
     public class FileUploadService
     {

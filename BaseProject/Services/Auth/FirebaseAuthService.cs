@@ -1,0 +1,50 @@
+﻿using FirebaseAdmin.Auth;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Logging;
+using SupportMe.Data;
+using SupportMe.DTOs.FirebaseDTOs;
+using SupportMe.Helpers;
+using SupportMe.Models;
+
+namespace SupportMe.Services.Auth
+{
+    public class FirebaseAuthService
+    {
+        private readonly FirebaseHandler _firebaseHandler;
+        private readonly DataContext _context;
+        public FirebaseAuthService(FirebaseHandler firebaseHandler, DataContext context)
+        {
+            _firebaseHandler = firebaseHandler;
+            _context = context;
+        }
+
+        public async Task<RegisterFirebase> CreateUserFireBase(User user, string Password)
+        {
+            try
+            {
+                var firebaseConfig = await _context.FirebaseConfig.FirstOrDefaultAsync();
+                var fireBaseUser = await _firebaseHandler.Auth.TenantManager.AuthForTenant(firebaseConfig.TenantId).CreateUserAsync(new UserRecordArgs
+                {
+                    Disabled = false,
+                    Email = user.Email,
+                    Password = Password,
+                    DisplayName = $"{user.Name} {user.LastName}",
+                    EmailVerified = true,
+                });
+
+                user.AuthExternalId = fireBaseUser.Uid;
+                _context.Users.Update(user);
+                await _context.SaveChangesAsync();
+                RegisterFirebase response = new RegisterFirebase { Id = fireBaseUser.Uid, Success = true };
+
+                return response;
+            }
+            catch (Exception e)
+            {
+                //LogHelper.LogError($"FIREBASE RESPONSE : {e.Message} ");
+
+                return new RegisterFirebase { Id = null, Success = false };
+            }
+        }
+    }
+}

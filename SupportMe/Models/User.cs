@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SupportMe.Models
 {
-    [Table("User")]
+    [Table("Users")]
     public class User
     {
         [Key]
@@ -11,6 +11,6 @@ namespace SupportMe.Models
         public string Name { get; set; }
         public string? LastName { get; set; }
         public string Email { get; set; }
-        public string AuthExternalId { get; set; }
+        public string? AuthExternalId { get; set; }
     }
 }

@@ -12,18 +12,20 @@ namespace SupportMe.Services.Auth
     {
         private readonly FirebaseHandler _firebaseHandler;
         private readonly DataContext _context;
-        public FirebaseAuthService(FirebaseHandler firebaseHandler, DataContext context)
+        private IConfiguration _configuration;
+        public FirebaseAuthService(FirebaseHandler firebaseHandler, DataContext context, IConfiguration configuration)
         {
             _firebaseHandler = firebaseHandler;
             _context = context;
+            _configuration = configuration;
         }
 
         public async Task<RegisterFirebase> CreateUserFireBase(User user, string Password)
         {
             try
             {
-                var firebaseConfig = await _context.FirebaseConfig.FirstOrDefaultAsync();
-                var fireBaseUser = await _firebaseHandler.Auth.TenantManager.AuthForTenant(firebaseConfig.TenantId).CreateUserAsync(new UserRecordArgs
+                var firebaseTenantId = _configuration.GetValue<string>("TenantId");
+                var fireBaseUser = await _firebaseHandler.Auth.CreateUserAsync(new UserRecordArgs
                 {
                     Disabled = false,
                     Email = user.Email,

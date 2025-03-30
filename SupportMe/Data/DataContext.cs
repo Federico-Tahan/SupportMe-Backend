@@ -12,8 +12,7 @@ namespace SupportMe.Data
         }
 
         public DbSet<User> Users { get; set; }
-
-        public DbSet<FirebaseConfig> FirebaseConfig { get; set; }
+        public DbSet<EmailSenderConfig> EmailSenderConfig { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         { 

@@ -1,0 +1,30 @@
+﻿using Microsoft.EntityFrameworkCore;
+using SupportMe.Data;
+using SupportMe.Helpers;
+
+namespace SupportMe.Services.Auth
+{
+    public class AuthService
+    {
+        private readonly DataContext _context;
+        private FirebaseAuthService _firebaseAuthService { get; set; }
+        private JwtConfig _jwtConfig { get; set; }
+        public IConfiguration _configuration { get; set; }
+        public AuthService(DataContext context, FirebaseAuthService firebaseAuthService, JwtConfig jwtConfig, IConfiguration configuration)
+        {
+            _context = context;
+            _firebaseAuthService = firebaseAuthService;
+            _jwtConfig = jwtConfig;
+            _configuration = configuration;
+        }
+
+        public async Task<string> CreateJwtFromFirebaseJwt(string firebaseJWT) 
+        {
+            var firebaseToken = await _firebaseAuthService.VerifyToken(firebaseJWT);
+            var ExpirationMinutesToken = _configuration.GetValue<int>("JWT__ExpirationMinutes");
+            var user = await _context.Users.Where(x => x.AuthExternalId == firebaseToken.Uid).FirstOrDefaultAsync();
+            var jwt = JwtManager.GenerateToken(_jwtConfig, user, ExpirationMinutesToken);
+            return jwt;
+        }
+    }
+}

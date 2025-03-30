@@ -94,33 +94,33 @@ builder.Services.AddCors(options =>
         });
 });
 
-//builder.Services
-//                .AddAuthentication()
-//                .AddJwtBearer("Token", jwt =>
-//                {
-//                    var pubKey =
-//                        builder.Configuration.GetValue<string>("Auth__Public");
-//                    var rsa = RSA.Create();
-//                    var pubKeyByteArray = Convert.FromBase64String(pubKey);
-//                    rsa.ImportRSAPublicKey(pubKeyByteArray, out _);
-//                    jwt.SaveToken = true;
-//                    jwt.RequireHttpsMetadata = false;
-//                    jwt.TokenValidationParameters = new TokenValidationParameters
-//                    {
-//                        ValidateIssuer = true,
-//                        ValidateAudience = true,
-//                        ValidateLifetime = true,
-//                        ValidateIssuerSigningKey = true,
-//                        ValidAudience = builder.Configuration.GetValue<string>("Auth__Audience"),
-//                        ValidIssuer = builder.Configuration.GetValue<string>("Auth__Issuer"),
-//                        ClockSkew = TimeSpan.Zero,
-//                        IssuerSigningKey = new RsaSecurityKey(rsa),
-//                        CryptoProviderFactory = new CryptoProviderFactory
-//                        {
-//                            CacheSignatureProviders = false
-//                        }
-//                    };
-//                });
+builder.Services
+                .AddAuthentication()
+                .AddJwtBearer("Token", jwt =>
+                {
+                    var pubKey =
+                        builder.Configuration.GetValue<string>("Auth__Public");
+                    var rsa = RSA.Create();
+                    var pubKeyByteArray = Convert.FromBase64String(pubKey);
+                    rsa.ImportRSAPublicKey(pubKeyByteArray, out _);
+                    jwt.SaveToken = true;
+                    jwt.RequireHttpsMetadata = false;
+                    jwt.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        ValidAudience = builder.Configuration.GetValue<string>("Auth__Audience"),
+                        ValidIssuer = builder.Configuration.GetValue<string>("Auth__Issuer"),
+                        ClockSkew = TimeSpan.Zero,
+                        IssuerSigningKey = new RsaSecurityKey(rsa),
+                        CryptoProviderFactory = new CryptoProviderFactory
+                        {
+                            CacheSignatureProviders = false
+                        }
+                    };
+                });
 
 
 

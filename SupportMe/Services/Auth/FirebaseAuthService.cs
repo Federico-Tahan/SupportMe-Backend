@@ -48,5 +48,14 @@ namespace SupportMe.Services.Auth
                 return new RegisterFirebase { Id = null, Success = false };
             }
         }
+        public async Task<FirebaseToken> VerifyToken(string firebaseToken)
+        {
+            var decodedToken = await _firebaseHandler.Auth.VerifyIdTokenAsync(firebaseToken);
+            if (decodedToken == null)
+            {
+                throw new Exception("not possible to decode");
+            }
+            return decodedToken;
+        }
     }
 }

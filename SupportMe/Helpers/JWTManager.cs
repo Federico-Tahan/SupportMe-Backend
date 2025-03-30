@@ -12,7 +12,6 @@ namespace SupportMe.Helpers
         public static string GenerateToken(JwtConfig config, User user, int expireMinutes = 1440)
         {
 
-            //todo: set claims similar to wr-core
             List<Claim> claims = new()
             {
                 new Claim(ClaimTypes.Sid, user.Id),

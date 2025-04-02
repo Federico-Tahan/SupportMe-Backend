@@ -16,11 +16,11 @@ namespace SupportMe.Controllers
             _campaignService = campaignService;
         }
 
-        [HttpPost]
-        public async Task<IActionResult> CreateCampaign([FromBody] CampaignWriteDTO request) 
-        {
-            var result = await _campaignService.CreateCampaign(request);
-            return Ok(result);
-        }
+        //[HttpPost]
+        //public async Task<IActionResult> CreateCampaign([FromBody] CampaignWriteDTO request) 
+        //{
+        //    var result = await _campaignService.CreateCampaign(request);
+        //    return Ok(result);
+        //}
     }
 }

@@ -18,6 +18,7 @@ using Microsoft.OpenApi.Models;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Cryptography;
 using SupportMe.Services.Auth;
+using SixLabors.ImageSharp;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -138,7 +139,15 @@ builder.Services
 builder.Services.AddScoped<FirebaseAuthService>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<CampaignService>();
+builder.Services.AddScoped<AuthService>();
 
+
+
+builder.Services.AddSingleton(
+    new JwtConfig(
+        builder.Configuration.GetValue<string>("Auth__Private"),
+        builder.Configuration.GetValue<string>("Auth__Audience"),
+        builder.Configuration.GetValue<string>("Auth__Issuer")));
 /* ################################################### */
 /* ################################################### */
 

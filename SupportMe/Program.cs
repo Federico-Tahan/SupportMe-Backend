@@ -73,14 +73,21 @@ builder.Services.AddSingleton(provider =>
     return new FirebaseHandler(FirebaseAuth.GetAuth(app), FirebaseMessaging.GetMessaging(app));
 });
 
-//var s3Config = new S3Config
-//{
-//    Access = builder.Configuration.GetValue<string>("AmazonS3_Access"),
-//    Secret = builder.Configuration.GetValue<string>("AmazonS3_Secret")
-//};
 
-//var s3Client = new AmazonS3Client(s3Config.Access, s3Config.Secret, RegionEndpoint.USEast1);
-//builder.Services.AddScoped<FileUploadService>(_ => new FileUploadService(s3Client));
+builder.Services.AddSingleton(new S3BucketConfig(
+                    builder.Configuration.GetValue<string>("Service:BaseUrl"),
+                    builder.Configuration.GetValue<string>("GENERAL_BUCKET"),
+                    builder.Configuration.GetValue<string>("CDN_URL")
+                    ));
+
+var s3Config = new S3Config
+{
+    Access = builder.Configuration.GetValue<string>("AmazonS3_Access"),
+    Secret = builder.Configuration.GetValue<string>("AmazonS3_Secret")
+};
+
+var s3Client = new AmazonS3Client(s3Config.Access, s3Config.Secret, RegionEndpoint.USEast1);
+builder.Services.AddScoped<FileUploadService>(_ => new FileUploadService(s3Client));
 
 
 builder.Services.AddCors(options =>
@@ -130,6 +137,7 @@ builder.Services
 
 builder.Services.AddScoped<FirebaseAuthService>();
 builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<CampaignService>();
 
 /* ################################################### */
 /* ################################################### */

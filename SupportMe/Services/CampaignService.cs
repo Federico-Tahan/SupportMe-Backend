@@ -2,6 +2,8 @@
 using SupportMe.Data;
 using SupportMe.DTOs.CampaignDTOs;
 using SupportMe.DTOs.FileUploadDTOs;
+using SupportMe.Helpers;
+using SupportMe.Models;
 
 namespace SupportMe.Services
 {
@@ -20,9 +22,21 @@ namespace SupportMe.Services
         }
 
 
-        public async Task<string> CreateCampaign(CampaignWriteDTO request) 
+        public async Task<string> CreateCampaign(CampaignWriteDTO request, string userId) 
         {
-            var url = await _fileUploadService.ProcessImageUrl(_S3BucketConfig.Bucket, _S3BucketConfig.CdnUrl, request.MainImage, resizeToMultipleSizes: false);
+            Campaign campaign = new Campaign();
+            campaign.CreationDate = DateTime.Now;
+            campaign.Name = request.Name;
+            campaign.Description = request.Description;
+            campaign.GoalDate = request.GoalDate;
+            campaign.GoalAmount = request.GoalAmount;
+            campaign.UserId = userId;
+
+            var url = !string.IsNullOrWhiteSpace(request.MainImage) && !request.MainImage.IsUrl() &&
+                                    ImageHelper.ValidateImageFormat(request.MainImage) ? 
+                                    await _fileUploadService.ProcessImageUrl(_S3BucketConfig.Bucket, _S3BucketConfig.CdnUrl, request.MainImage, resizeToMultipleSizes: false) :
+                                    request.MainImage;
+            campaign.MainImage = url;
             return url;
         }
     }

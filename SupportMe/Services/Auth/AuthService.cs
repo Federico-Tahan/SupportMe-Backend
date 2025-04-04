@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SupportMe.Data;
+using SupportMe.DTOs.UserDTOs;
 using SupportMe.Helpers;
 
 namespace SupportMe.Services.Auth
@@ -18,13 +19,15 @@ namespace SupportMe.Services.Auth
             _configuration = configuration;
         }
 
-        public async Task<string> CreateJwtFromFirebaseJwt(string firebaseJWT) 
+        public async Task<LoginDTO> CreateJwtFromFirebaseJwt(string firebaseJWT) 
         {
             var firebaseToken = await _firebaseAuthService.VerifyToken(firebaseJWT);
             var ExpirationMinutesToken = _configuration.GetValue<int>("JWT__ExpirationMinutes");
             var user = await _context.Users.Where(x => x.AuthExternalId == firebaseToken.Uid).FirstOrDefaultAsync();
             var jwt = JwtManager.GenerateToken(_jwtConfig, user, ExpirationMinutesToken);
-            return jwt;
+            var token = new LoginDTO();
+            token.Token = jwt;
+            return token;
         }
     }
 }

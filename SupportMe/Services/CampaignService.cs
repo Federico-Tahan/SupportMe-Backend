@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using SupportMe.Data;
+using SupportMe.DTOs;
 using SupportMe.DTOs.CampaignDTOs;
 using SupportMe.DTOs.FileUploadDTOs;
 using SupportMe.Helpers;
@@ -21,7 +23,33 @@ namespace SupportMe.Services
             _S3BucketConfig = s3;
         }
 
+        public async Task<PaginationDTO<CampaignReadDTO>> GetCampaigns(CampaignFilter filter) 
+        {
+            var campaignQuery = _context.Campaigns.AsQueryable();
 
+            if (filter.CategoryId != null) 
+            {
+                
+            }
+
+            var totalRegisters = await campaignQuery.CountAsync();
+            campaignQuery = SortingHelper.ApplyMultipleSortingAndPagination(campaignQuery, filter, true);
+
+            var response = new PaginationDTO<CampaignReadDTO>();
+            response.Items = await campaignQuery
+                                    .Select(x => new CampaignReadDTO 
+                                    {
+                                        Id = x.Id,
+                                        CreationDate = x.CreationDate,
+                                        Description = x.Description,
+                                        GoalAmount = x.GoalAmount,
+                                        GoalDate = x.GoalDate,
+                                        MainImage = x.MainImage,
+                                        Name = x.Name,
+                                    }).ToListAsync();
+            response.TotalRegisters = totalRegisters;
+            return response;
+        }
         public async Task<string> CreateCampaign(CampaignWriteDTO request, string userId) 
         {
             Campaign campaign = new Campaign();

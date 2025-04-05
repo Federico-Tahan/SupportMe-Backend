@@ -1,51 +1,153 @@
-﻿using SupportMe.DTOs;
+﻿using Microsoft.IdentityModel.Tokens;
+using SupportMe.DTOs;
 using SupportMe.Models.Enums;
+using System.Linq.Expressions;
+using System.Reflection;
 
 namespace SupportMe.Helpers
 {
     public static class SortingHelper
     {
-
-        /// <summary>
-        /// Applies sorting to an IQueryable based on entity properties and filter parameters. Additionally, supports pagination using Skip and Limit.
-        /// </summary>
-        /// <typeparam name="T">Type of entity in the IQueryable.</typeparam>
-        /// <param name="query">IQueryable to which sorting will be applied.</param>
-        /// <param name="filter">Sorting filter containing the column and order, and optional pagination parameters.</param>
-        /// <returns>IQueryable with applied sorting and pagination.</returns>
-        public static IQueryable<T> ApplySortingAndPagination<T>(IQueryable<T> query, BaseFilter filter)
+        public static IQueryable<T> ApplyMultipleSortingAndPagination<T>(IQueryable<T> query, BaseFilter filter, bool applyPagination = false)
         {
-            if (!string.IsNullOrEmpty(filter.ColumnFilter))
+            IOrderedQueryable<T> orderedQuery = null;
+
+            if (!filter.Sorting.IsNullOrEmpty())
             {
-                string methodName = filter.SortBy == SORTBY.DESC ? "OrderByDescending" : "OrderBy";
-                var type = typeof(T);
-                var property = type.GetProperties().FirstOrDefault(p => p.Name.Equals(filter.ColumnFilter, StringComparison.OrdinalIgnoreCase));
-
-                if (property != null)
+                foreach (var sort in filter.Sorting)
                 {
-                    var parameter = System.Linq.Expressions.Expression.Parameter(type, "p");
-                    var propertyAccess = System.Linq.Expressions.Expression.MakeMemberAccess(parameter, property);
-                    var orderByExpression = System.Linq.Expressions.Expression.Lambda(propertyAccess, parameter);
+                    string methodName;
 
-                    var resultExpression = System.Linq.Expressions.Expression.Call(typeof(Queryable), methodName,
+                    if (orderedQuery == null)
+                    {
+                        methodName = sort.SortBy == SORTBY.DESC ? "OrderByDescending" : "OrderBy";
+                    }
+                    else
+                    {
+                        methodName = sort.SortBy == SORTBY.DESC ? "ThenByDescending" : "ThenBy";
+                    }
+
+                    var type = typeof(T);
+                    var property = FindPropertyV2(type, sort.Field, out List<PropertyInfo> parentProperty);
+
+                    if (property == null)
+                    {
+                        throw new InvalidOperationException($"Property '{sort.Field}' not found in type '{type.Name}'.");
+                    }
+
+                    var parameter = Expression.Parameter(type, "p");
+                    var propertyAccess = parentProperty == null
+                        ? Expression.MakeMemberAccess(parameter, property)
+                        : CreatePropertyAccess(parameter, parentProperty, property);
+
+                    var orderByExpression = Expression.Lambda(propertyAccess, parameter);
+
+                    var resultExpression = Expression.Call(
+                        typeof(Queryable),
+                        methodName,
                         new Type[] { type, property.PropertyType },
-                        query.Expression, System.Linq.Expressions.Expression.Quote(orderByExpression));
+                        (orderedQuery == null ? query.Expression : orderedQuery.Expression),
+                        Expression.Quote(orderByExpression)
+                    );
 
-                    query = query.Provider.CreateQuery<T>(resultExpression);
+                    orderedQuery = query.Provider.CreateQuery<T>(resultExpression) as IOrderedQueryable<T>;
                 }
+            }
+
+            var response = orderedQuery ?? query;
+
+            if (!applyPagination)
+            {
+                return response;
             }
 
             if (filter.Skip.HasValue)
             {
-                query = query.Skip(filter.Skip.Value);
+                response = response.Skip(filter.Skip.Value);
             }
 
             if (filter.Limit.HasValue)
             {
-                query = query.Take(filter.Limit.Value);
+                response = response.Take(filter.Limit.Value);
             }
 
-            return query;
+            return response;
+        }
+
+        private static Expression CreatePropertyAccess(Expression parameter, List<PropertyInfo> parentProperty, PropertyInfo property)
+        {
+            Expression parentPropertyAccess = parameter;
+            parentProperty.Reverse();
+            foreach (var item in parentProperty)
+            {
+
+                parentPropertyAccess = Expression.MakeMemberAccess(parentPropertyAccess, item);
+
+            }
+            //var parentPropertyAccess = Expression.MakeMemberAccess(parameter, parentProperty);
+            var propertyAccess = Expression.MakeMemberAccess(parentPropertyAccess, property);
+
+            return propertyAccess;
+        }
+
+        private static PropertyInfo FindPropertyV2(Type type, string propertyName, out List<PropertyInfo> parentProperty)
+        {
+            var properties = type.GetProperties();
+
+            if (properties.IsNullOrEmpty())
+            {
+                parentProperty = null;
+                return null;
+            }
+
+            if (propertyName.IsNullOrEmpty())
+            {
+                parentProperty = null;
+                return null;
+            }
+            var propertiesPath = propertyName.SplitAtFirstDot();
+
+            var prop = properties.Where(x => x.Name.Equals(propertiesPath[0], StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
+
+            if (prop is null)
+            {
+                parentProperty = null;
+                return null;
+            }
+
+            if (propertiesPath.Count() > 1)
+            {
+
+                var result = FindPropertyV2(prop.PropertyType, propertiesPath[1], out parentProperty);
+                if (parentProperty is null)
+                {
+                    parentProperty = new List<PropertyInfo>();
+                }
+                parentProperty.Add(prop);
+
+                return result;
+            }
+            else
+            {
+                parentProperty = new List<PropertyInfo>();
+                return prop;
+            }
+
+            parentProperty = null;
+            return null;
+        }
+        static string[] SplitAtFirstDot(this string input)
+        {
+            int dotIndex = input.IndexOf('.');
+            if (dotIndex == -1)
+            {
+                return new[] { input };
+            }
+            return new[]
+            {
+            input.Substring(0, dotIndex),
+            input.Substring(dotIndex + 1)
+            };
         }
     }
 }

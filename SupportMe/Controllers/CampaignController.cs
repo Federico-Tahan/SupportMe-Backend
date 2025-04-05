@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using SupportMe.DTOs;
 using SupportMe.DTOs.CampaignDTOs;
 using SupportMe.Services;
 
@@ -15,6 +16,14 @@ namespace SupportMe.Controllers
         {
             _campaignService = campaignService;
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetCampaigns([FromQuery] CampaignFilter filter) 
+        {
+            var campaigns = await _campaignService.GetCampaigns(filter);
+            return Ok(campaigns);
+        }
+
 
         //[HttpPost]
         //public async Task<IActionResult> CreateCampaign([FromBody] CampaignWriteDTO request) 

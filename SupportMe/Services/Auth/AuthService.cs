@@ -26,6 +26,10 @@ namespace SupportMe.Services.Auth
             var user = await _context.Users.Where(x => x.AuthExternalId == firebaseToken.Uid).FirstOrDefaultAsync();
             var jwt = JwtManager.GenerateToken(_jwtConfig, user, ExpirationMinutesToken);
             var token = new LoginDTO();
+            token.Email = user.Email;
+            token.FirstName = user.Name;
+            token.LastName = user.Name;
+            token.ProfilePic = user.ProfilePic;
             token.Token = jwt;
             return token;
         }

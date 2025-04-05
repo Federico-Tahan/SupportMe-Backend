@@ -12,5 +12,6 @@ namespace SupportMe.Models
         public string? LastName { get; set; }
         public string Email { get; set; }
         public string? AuthExternalId { get; set; }
+        public string? ProfilePic { get; set; }
     }
 }

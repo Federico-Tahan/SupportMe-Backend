@@ -31,7 +31,7 @@ namespace SupportMe.Controllers
 
         [HttpPost("login")]
         [AllowAnonymous]
-        public async Task<IActionResult> Login([FromBody] LoginDTO request)
+        public async Task<IActionResult> Login([FromBody] LoginToken request)
         {
             var response = await _authService.CreateJwtFromFirebaseJwt(request.Token);
             return Ok(response);

@@ -140,7 +140,7 @@ builder.Services.AddScoped<FirebaseAuthService>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<CampaignService>();
 builder.Services.AddScoped<AuthService>();
-
+builder.Services.AddScoped<CategoryService>();
 
 
 builder.Services.AddSingleton(

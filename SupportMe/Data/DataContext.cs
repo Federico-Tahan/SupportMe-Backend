@@ -15,6 +15,7 @@ namespace SupportMe.Data
         public DbSet<EmailSenderConfig> EmailSenderConfig { get; set; }
         public DbSet<Campaign> Campaigns { get; set; }
         public DbSet<GaleryAssets> GaleryAssets { get; set; }
+        public DbSet<Category> Category { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         { 

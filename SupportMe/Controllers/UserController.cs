@@ -25,15 +25,31 @@ namespace SupportMe.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> RegisterUser([FromBody] RegisterUserDTO user) 
         {
-            await _userService.RegisterUser(user);
+            var result = await _userService.RegisterUser(user);
+            return Ok(result);
+        }
+        [HttpGet("email")]
+        [AllowAnonymous]
+        public async Task<IActionResult> Email()
+        {
+            await _userService.SendEmail();
             return Ok();
         }
+
 
         [HttpPost("login")]
         [AllowAnonymous]
         public async Task<IActionResult> Login([FromBody] LoginToken request)
         {
             var response = await _authService.CreateJwtFromFirebaseJwt(request.Token);
+            return Ok(response);
+        }
+
+        [HttpGet("email/available")]
+        [AllowAnonymous]
+        public async Task<IActionResult> IsAvailableEmail([FromQuery] string email)
+        {
+            var response = await _authService.IsAvailableEmail(email);
             return Ok(response);
         }
     }

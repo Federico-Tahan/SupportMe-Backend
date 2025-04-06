@@ -7,7 +7,7 @@ namespace SupportMe.Services.Email
 {
     public class EmailFactory
     {
-        public static void SendEmail(Models.Email email, DataContext context)
+        public static async void SendEmail(Models.Email email, DataContext context)
         {
 
             var emailSender = context.EmailSenderConfig.FirstOrDefault();
@@ -31,7 +31,7 @@ namespace SupportMe.Services.Email
             }
 
             message.Subject = email.Subject;
-            message.Body = email.Message;
+            message.Body = await RenderViewToStringAsync(email.ViewName, email.Object);
             message.IsBodyHtml = true;
 
             foreach (var item in email.Attachments)

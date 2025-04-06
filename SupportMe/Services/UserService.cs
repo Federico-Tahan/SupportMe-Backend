@@ -1,9 +1,13 @@
-﻿using AutoMapper;
+﻿using Amazon.Auth.AccessControlPolicy;
+using AutoMapper;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Win32;
 using SupportMe.Data;
 using SupportMe.DTOs.UserDTOs;
 using SupportMe.Models;
 using SupportMe.Services.Auth;
 using SupportMe.Services.Email;
+using SupportMe.Services.Email.Views;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
@@ -22,12 +26,23 @@ namespace SupportMe.Services
         }
 
 
-        public async Task RegisterUser(RegisterUserDTO request) 
+
+        public async Task SendEmail() 
         {
+            var user = await _context.Users.Where(x => x.Email == "fedetahan8@gmail.com").FirstOrDefaultAsync();
+            RegisterModel register = new RegisterModel();
+            register.User = user;
+            SupportMe.Models.Email email = new SupportMe.Models.Email("Registro de usuario", "~/Services/Email/Views/RegisterUser.cshtml", user.Email, register);
+            EmailFactory.SendEmail(email, _context);
+        }
+        public async Task<bool> RegisterUser(RegisterUserDTO request) 
+        {
+            var success = false;
             var transaction = _context.Database.BeginTransaction();
             try
             {
                 var user = _mapper.Map<User>(request);
+                user.Name = request.FirstName;
                 user.Id = Guid.NewGuid().ToString();
                 _context.Add(user);
                 await _context.SaveChangesAsync();
@@ -37,15 +52,19 @@ namespace SupportMe.Services
                 {
                     throw new Exception("CANNONT_REGISTER_FIREBASE");
                 }
+            
                 await transaction.CommitAsync();
-                SupportMe.Models.Email email = new SupportMe.Models.Email("Registro de usuario", "Prueba", user.Email);
+                RegisterModel register = new RegisterModel();
+                register.User = user;
+                SupportMe.Models.Email email = new SupportMe.Models.Email("Registro de usuario", "~Services/Email/Views/RegisterUser.cshtml", user.Email, register);
                 EmailFactory.SendEmail(email, _context);
+                success = true;
             }
             catch (Exception e) 
             {
-                await transaction.RollbackAsync();
-                throw e;
+                await transaction.RollbackAsync();            
             }
+            return success;
         }
 
         public async Task<User> GetUserById(string id)

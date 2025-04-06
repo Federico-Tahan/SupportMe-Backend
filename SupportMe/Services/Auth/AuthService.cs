@@ -33,5 +33,11 @@ namespace SupportMe.Services.Auth
             token.Token = jwt;
             return token;
         }
+
+        public async Task<bool> IsAvailableEmail(string email)
+        {
+            var user = await _context.Users.AnyAsync(x => x.Email == email);
+            return !user;
+        }
     }
 }

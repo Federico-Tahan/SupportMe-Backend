@@ -91,17 +91,6 @@ var s3Client = new AmazonS3Client(s3Config.Access, s3Config.Secret, RegionEndpoi
 builder.Services.AddScoped<FileUploadService>(_ => new FileUploadService(s3Client));
 
 
-builder.Services.AddCors(options =>
-{
-    options.AddDefaultPolicy(
-        policy =>
-        {
-            policy.AllowAnyHeader()
-                  .AllowAnyMethod()
-                  .AllowAnyOrigin();
-        });
-});
-
 builder.Services
                 .AddAuthentication()
                 .AddJwtBearer("Token", jwt =>
@@ -150,7 +139,13 @@ builder.Services.AddSingleton(
         builder.Configuration.GetValue<string>("Auth__Issuer")));
 /* ################################################### */
 /* ################################################### */
-
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll",
+        builder => builder.AllowAnyOrigin()
+                          .AllowAnyMethod()
+                          .AllowAnyHeader());
+});
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -161,7 +156,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseCors();
+app.UseCors("AllowAll");
 
 app.UseAuthorization();
 app.UseMiddleware<UserAuthMiddleware>();

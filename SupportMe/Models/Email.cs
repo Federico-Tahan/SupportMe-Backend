@@ -17,18 +17,21 @@ namespace SupportMe.Models
 
         public string Subject { get; set; }
 
-        public string Message { get; set; }
+        public string ViewName { get; set; }
+        public object Object { get; set; }
 
         public List<Attachment> Attachments { get; set; }
 
-        public Email(string subject, string message, string emailToSend)
+        public Email(string subject, string viewName, string emailToSend, object objecto)
         {
             this.FromName = "SupportMe";
             this.Subject = subject;
-            this.Message = message;
+            this.ViewName = viewName;
+            this.Object = objecto;
             this.ToAddresses = new List<string>() { emailToSend };
             this.ToBccAddresses = new List<string>();
             this.Attachments = new List<Attachment>();
+
         }
 
     }

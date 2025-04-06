@@ -1,0 +1,178 @@
+﻿@model SupportMe.Services.Email.Views.RegisterModel
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro Exitoso</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .email-card {
+            background-color: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            margin-top: 20px;
+        }
+        .logo {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .logo img {
+            max-width: 150px;
+            height: auto;
+        }
+        .title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #333;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        .subtitle {
+            font-size: 16px;
+            color: #666;
+            text-align: center;
+            margin-bottom: 30px;
+            line-height: 1.5;
+        }
+        .btn-container {
+            text-align: center;
+            margin: 30px 0;
+        }
+        .btn-continue {
+            display: inline-block;
+            padding: 12px 30px;
+            background-color: #4361ee;
+            color: white !important;
+            text-decoration: none;
+            font-weight: 600;
+            border-radius: 8px;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .btn-continue:hover {
+            background-color: #3a56d4;
+        }
+        .info-block {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 30px;
+        }
+        .info-title {
+            font-weight: 600;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            color: #999;
+            font-size: 14px;
+        }
+        .social-links {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .social-icon {
+            display: inline-block;
+            margin: 0 10px;
+            color: #4361ee;
+            font-size: 22px;
+        }
+        @@keyframes wave {
+            0% { transform: rotate(0deg); }
+            10% { transform: rotate(14deg); }
+            20% { transform: rotate(-8deg); }
+            30% { transform: rotate(14deg); }
+            40% { transform: rotate(-4deg); }
+            50% { transform: rotate(10deg); }
+            60% { transform: rotate(0deg); }
+            100% { transform: rotate(0deg); }
+        }
+        .wave-emoji {
+            display: inline-block;
+            transform-origin: 70% 70%;
+            animation: wave 2.5s infinite;
+        }
+        @@media screen and (max-width: 480px) {
+            .container {
+                padding: 10px;
+            }
+            .email-card {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="email-card">
+            <div class="logo">
+                <img src="https://supportme2.s3.sa-east-1.amazonaws.com/Group+408.png" alt="Logo">
+            </div>
+            
+            <h1 class="title">&#161;Registro Exitoso! <span class="wave-emoji">👋</span></h1>
+            
+            <p class="subtitle">
+                Hola <strong>@Model.User.Name @Model.User.LastName</strong>, gracias por unirte a SupportMe. 
+                Tu cuenta ha sido creada correctamente y ya puedes comenzar a disfrutar de todos nuestros servicios.
+            </p>
+            
+            <div class="btn-container">
+                <a href="https://supportme.com.ar" class="btn-continue">Ir a la aplicaci&#243;n</a>
+            </div>
+            
+            <div class="info-block">
+                <p class="info-title">Detalles de tu cuenta:</p>
+                <p><strong>Email:</strong> @Model.User.Email</p>
+                <p><strong>Fecha de registro:</strong> @DateTime.UtcNow.ToString("dd/MM/yyyy")</p>
+                <p>
+                    Si tienes alguna pregunta o necesitas ayuda, no dudes en 
+                    <a href="mailto:infosuppme@gmail.com" style="color: #4361ee; text-decoration: none;">contactarnos</a>.
+                </p>
+            </div>
+            
+            <div class="social-links">
+                <a href="#" class="social-icon"><i class="fab fa-facebook"></i></a>
+                <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
+                <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
+                <a href="#" class="social-icon"><i class="fab fa-linkedin"></i></a>
+            </div>
+            
+            <div class="footer">
+                <p>&#169; @DateTime.Now.Year SupportMe. Todos los derechos reservados.</p>
+                <p>
+                    <a href="#" style="color: #666; text-decoration: none; margin: 0 10px;">Pol&#237;tica de privacidad</a> | 
+                    <a href="#" style="color: #666; text-decoration: none; margin: 0 10px;">T&#233;rminos de servicio</a>
+                </p>
+                <p style="margin-top: 15px;">
+                    Si no deseas recibir estos correos, puedes <a href="#" style="color: #666;">darte de baja</a>.
+                </p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

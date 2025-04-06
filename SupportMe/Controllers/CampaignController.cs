@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using SupportMe.DTOs;
 using SupportMe.DTOs.CampaignDTOs;
+using SupportMe.MiddleWares;
 using SupportMe.Services;
 
 namespace SupportMe.Controllers
@@ -20,7 +21,8 @@ namespace SupportMe.Controllers
         [HttpGet]
         public async Task<IActionResult> GetCampaigns([FromQuery] CampaignFilter filter) 
         {
-            var campaigns = await _campaignService.GetCampaigns(filter);
+            UserMiddelware user = (UserMiddelware)HttpContext.Items["UserMiddelware"]; 
+            var campaigns = await _campaignService.GetCampaigns(filter, user?.User?.Id);
             return Ok(campaigns);
         }
 

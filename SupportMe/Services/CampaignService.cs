@@ -25,15 +25,20 @@ namespace SupportMe.Services
             _S3BucketConfig = s3;
         }
 
-        public async Task<PaginationDTO<CampaignReadDTO>> GetCampaigns(CampaignFilter filter) 
+        public async Task<PaginationDTO<CampaignReadDTO>> GetCampaigns(CampaignFilter filter, string? userId) 
         {
             var campaignQuery = _context.Campaigns.AsQueryable();
+
+            if (!userId.IsNullOrEmpty()) 
+            {
+                campaignQuery = campaignQuery.Where(x => x.UserId == userId);
+            }
+
 
             if (filter.CategoryId != null) 
             {
                 
             }
-
             if (!filter.TextFilter.IsNullOrEmpty())
             {
                 campaignQuery = campaignQuery.Where(x => EF.Functions.Collate(x.Name, Colacion).Contains(filter.TextFilter));

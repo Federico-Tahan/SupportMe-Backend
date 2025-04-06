@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using SupportMe.Data;
 using SupportMe.DTOs;
 using SupportMe.DTOs.CampaignDTOs;
@@ -14,6 +15,7 @@ namespace SupportMe.Services
         private readonly DataContext _context;
         private readonly IMapper _mapper;
         private readonly FileUploadService _fileUploadService;
+        private const string Colacion = "SQL_Latin1_General_CP1_CI_AI";
         private readonly S3BucketConfig _S3BucketConfig;
         public CampaignService(DataContext context, IMapper mapper, FileUploadService fileUpload, S3BucketConfig s3)
         {
@@ -30,6 +32,11 @@ namespace SupportMe.Services
             if (filter.CategoryId != null) 
             {
                 
+            }
+
+            if (!filter.TextFilter.IsNullOrEmpty())
+            {
+                campaignQuery = campaignQuery.Where(x => EF.Functions.Collate(x.Name, Colacion).Contains(filter.TextFilter));
             }
 
             var totalRegisters = await campaignQuery.CountAsync();

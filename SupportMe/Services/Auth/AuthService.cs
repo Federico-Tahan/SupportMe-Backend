@@ -21,7 +21,7 @@ namespace SupportMe.Services.Auth
 
         public async Task<LoginDTO> CreateJwtFromFirebaseJwt(string firebaseJWT) 
         {
-            var firebaseToken = await _firebaseAuthService.VerifyToken(firebaseJWT);
+           var firebaseToken = await _firebaseAuthService.VerifyToken(firebaseJWT);
             var ExpirationMinutesToken = _configuration.GetValue<int>("JWT__ExpirationMinutes");
             var user = await _context.Users.Where(x => x.AuthExternalId == firebaseToken.Uid).FirstOrDefaultAsync();
             var jwt = JwtManager.GenerateToken(_jwtConfig, user, ExpirationMinutesToken);

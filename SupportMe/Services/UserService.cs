@@ -56,7 +56,7 @@ namespace SupportMe.Services
                 await transaction.CommitAsync();
                 RegisterModel register = new RegisterModel();
                 register.User = user;
-                SupportMe.Models.Email email = new SupportMe.Models.Email("Registro de usuario", "~Services/Email/Views/RegisterUser.cshtml", user.Email, register);
+                SupportMe.Models.Email email = new SupportMe.Models.Email("Registro de usuario", "~/Services/Email/Views/RegisterUser.cshtml", user.Email, register);
                 EmailFactory.SendEmail(email, _context);
                 success = true;
             }

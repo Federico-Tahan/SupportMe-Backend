@@ -164,7 +164,7 @@ app.UseHttpsRedirection();
 app.UseCors();
 
 app.UseAuthorization();
-
+app.UseMiddleware<UserAuthMiddleware>();
 app.UseMiddleware<ErrorHandlerMiddleware>();
 
 app.MapControllers();

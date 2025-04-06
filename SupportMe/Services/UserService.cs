@@ -4,6 +4,8 @@ using SupportMe.DTOs.UserDTOs;
 using SupportMe.Models;
 using SupportMe.Services.Auth;
 using SupportMe.Services.Email;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace SupportMe.Services
 {
@@ -44,8 +46,35 @@ namespace SupportMe.Services
                 await transaction.RollbackAsync();
                 throw e;
             }
+        }
+
+        public async Task<User> GetUserById(string id)
+        {
+            var user = await _context.Users.FindAsync(id);
+            return user;
+        }
+
+        public async Task<User> GetUserByToken(string token) 
+        {
+            if (string.IsNullOrEmpty(token))
+                return null;
+
+            var userId = this.DecodeToken(token);
+
+            if (string.IsNullOrEmpty(userId))
+                return null;
+
+            var user = await GetUserById(userId);
+            return user;
+        }
 
 
+        private string DecodeToken(string token)
+        {
+            var handler = new JwtSecurityTokenHandler();
+            var jwtToken = handler.ReadToken(token.Replace("Bearer ", "")) as JwtSecurityToken;
+            var userIdClaim = jwtToken?.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Sid)?.Value;
+            return userIdClaim;
         }
     }
 }

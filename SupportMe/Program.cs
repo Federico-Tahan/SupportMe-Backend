@@ -130,6 +130,7 @@ builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<CampaignService>();
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<CategoryService>();
+builder.Services.AddScoped<MercadoPagoService>();
 
 
 builder.Services.AddSingleton(

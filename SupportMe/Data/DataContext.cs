@@ -16,6 +16,8 @@ namespace SupportMe.Data
         public DbSet<Campaign> Campaigns { get; set; }
         public DbSet<GaleryAssets> GaleryAssets { get; set; }
         public DbSet<Category> Category { get; set; }
+        public DbSet<UserMercadoPago> UserMercadoPago { get; set; }
+        public DbSet<MercadopagoSetup> MercadopagoSetup { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         { 

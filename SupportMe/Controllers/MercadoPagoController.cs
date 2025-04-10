@@ -1,0 +1,27 @@
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using SupportMe.MiddleWares;
+using SupportMe.Services;
+
+namespace SupportMe.Controllers
+{
+    [Route("api/[controller]")]
+    [ApiController]
+    public class MercadoPagoController : ControllerBase
+    {
+        private readonly MercadoPagoService _mp;
+
+        public MercadoPagoController(MercadoPagoService mp)
+        {
+            _mp = mp;
+        }
+
+        [HttpPost("oauth/token/generate")]
+        public async Task<IActionResult> OAuthCreateToken([FromQuery] string code) 
+        {
+            UserMiddelware user = (UserMiddelware)HttpContext.Items["UserMiddelware"];
+            var response = await _mp.ConnectOAuthAccount(code, user.User.Id);
+            return Ok(response);
+        }
+    }
+}

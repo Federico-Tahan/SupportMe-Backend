@@ -18,13 +18,26 @@ namespace SupportMe.Services
             _configuration = configuration;
             _context = context;
         }
+        public async Task<BaseValidation> DeleteToken(string userId)
+        {
+            BaseValidation response = new BaseValidation();
 
+            try
+            {
+                await _context.UserMercadoPago.Where(x => x.UserId == userId).ExecuteDeleteAsync();
+                response.Status = ValidationStatusCode.SUCCESS;
+            }
+            catch 
+            {
+            }
+            return response;
+        }
         public async Task<BaseValidation> ConnectOAuthAccount(string code, string userId)
         {
             BaseValidation response = new BaseValidation();
 
-            response.Status = ValidationStatusCode.SUCCESS;
-            return response;
+            //response.Status = ValidationStatusCode.SUCCESS;
+            //return response;
 
             MercadopagoSetup mercadoPagoSetup = await _context.MercadopagoSetup.FirstOrDefaultAsync();
             string mercadoPagoApi = $"{_configuration.GetValue<string>("MERCADO_PAGO_API")}/oauth/token";

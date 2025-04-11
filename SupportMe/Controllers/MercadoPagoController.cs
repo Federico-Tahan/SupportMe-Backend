@@ -23,5 +23,12 @@ namespace SupportMe.Controllers
             var response = await _mp.ConnectOAuthAccount(code, user.User.Id);
             return Ok(response);
         }
+        [HttpDelete("oauth/token")]
+        public async Task<IActionResult> DeleteToken()
+        {
+            UserMiddelware user = (UserMiddelware)HttpContext.Items["UserMiddelware"];
+            var response = await _mp.DeleteToken(user.User.Id);
+            return Ok(response);
+        }
     }
 }

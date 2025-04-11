@@ -19,7 +19,7 @@ namespace SupportMe.Services
         {
             SetupDTO setup = new SetupDTO();
             var hasMercadoPago = await _context.UserMercadoPago.Where(x => x.UserId == userId).AnyAsync();
-            setup.HasMercadoPagoConfigured = true;
+            setup.HasMercadoPagoConfigured = hasMercadoPago;
             return setup;
 
         }

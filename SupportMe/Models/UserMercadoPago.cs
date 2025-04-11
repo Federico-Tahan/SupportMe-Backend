@@ -12,7 +12,7 @@ namespace SupportMe.Models
         public string Token { get; set; }
         public DateTime CreatedDateUTC { get; set; }
         public int ExpirationSeconds { get; set; }
-        public int MPUserId { get; set; }
+        public string MPUserId { get; set; }
         public string refresh_token { get; set; }
         public string public_key { get; set; }
         public bool live_mode { get; set; }

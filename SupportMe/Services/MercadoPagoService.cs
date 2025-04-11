@@ -64,9 +64,9 @@ namespace SupportMe.Services
             UserMercadoPago userMercadoPago = new UserMercadoPago();
             userMercadoPago.public_key = responseDeserialize.public_key;
             userMercadoPago.refresh_token = responseDeserialize.refresh_token;
-            userMercadoPago.MPUserId = responseDeserialize.MPUserId;
+            userMercadoPago.MPUserId = responseDeserialize.userId;
             userMercadoPago.Token = responseDeserialize.access_token;
-            userMercadoPago.UserId = responseDeserialize.userId;
+            userMercadoPago.UserId = userId;
             userMercadoPago.CreatedDateUTC = DateTime.UtcNow;
             userMercadoPago.live_mode = responseDeserialize.live_mode;
             userMercadoPago.ExpirationSeconds = responseDeserialize.expires_in;

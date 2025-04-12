@@ -27,11 +27,13 @@ namespace SupportMe.Controllers
         }
 
 
-        //[HttpPost]
-        //public async Task<IActionResult> CreateCampaign([FromBody] CampaignWriteDTO request) 
-        //{
-        //    var result = await _campaignService.CreateCampaign(request);
-        //    return Ok(result);
-        //}
+        [HttpPost]
+        public async Task<IActionResult> CreateCampaign([FromBody] CampaignWriteDTO request)
+        {
+            UserMiddelware user = (UserMiddelware)HttpContext.Items["UserMiddelware"];
+
+            var result = await _campaignService.CreateCampaign(request, user.User.Id);
+            return Ok(result);
+        }
     }
 }

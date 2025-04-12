@@ -17,5 +17,8 @@ namespace SupportMe.Models
         public string UserId { get; set; }
         [ForeignKey(nameof(UserId))]
         public virtual User User { get; set; }
+        public virtual List<CampaignTags> Tags { get; set; }
+        public virtual List<GaleryAssets> Assets { get; set; }
+
     }
 }

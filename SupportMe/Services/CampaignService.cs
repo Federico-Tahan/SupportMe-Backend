@@ -77,6 +77,14 @@ namespace SupportMe.Services
                                     await _fileUploadService.ProcessImageUrl(_S3BucketConfig.Bucket, _S3BucketConfig.CdnUrl, request.MainImage, resizeToMultipleSizes: false) :
                                     request.MainImage;
             campaign.MainImage = url;
+
+            if (!request.Tags.IsNullOrEmpty())
+            {
+                List<CampaignTags> campaignTags = new List<CampaignTags>();
+                campaignTags.AddRange(request.Tags.Select(x => new CampaignTags { Tag = x.Tag }).ToList());
+                campaign.Tags = campaignTags;
+            }
+
             return url;
         }
     }

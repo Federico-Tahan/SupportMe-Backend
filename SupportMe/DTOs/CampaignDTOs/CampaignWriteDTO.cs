@@ -7,5 +7,17 @@
         public string? Description { get; set; }
         public decimal? GoalAmount { get; set; }
         public DateTime? GoalDate { get; set; }
+        public List<CampaignAssetsWriteDTO> Assets { get; set; }
+        public List<CampaignTagsWriteDTO> Tags { get; set; }
+
+    }
+
+    public class CampaignAssetsWriteDTO 
+    {
+        public string Base64 { get; set; }
+    }
+    public class CampaignTagsWriteDTO
+    {
+        public string Tag { get; set; }
     }
 }

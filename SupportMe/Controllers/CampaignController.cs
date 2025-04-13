@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SupportMe.DTOs;
 using SupportMe.DTOs.CampaignDTOs;
@@ -28,6 +29,7 @@ namespace SupportMe.Controllers
 
 
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> CreateCampaign([FromBody] CampaignWriteDTO request)
         {
             UserMiddelware user = (UserMiddelware)HttpContext.Items["UserMiddelware"];

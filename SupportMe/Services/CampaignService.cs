@@ -85,6 +85,8 @@ namespace SupportMe.Services
                 campaign.Tags = campaignTags;
             }
 
+            _context.Add(campaign);
+            await _context.SaveChangesAsync();
             return url;
         }
     }

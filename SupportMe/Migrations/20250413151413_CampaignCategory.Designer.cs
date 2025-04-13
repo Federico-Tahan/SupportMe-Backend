@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SupportMe.Data;
 
@@ -11,9 +12,11 @@ using SupportMe.Data;
 namespace SupportMe.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20250413151413_CampaignCategory")]
+    partial class CampaignCategory
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -44,9 +47,6 @@ namespace SupportMe.Migrations
 
                     b.Property<DateTime?>("GoalDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
 
                     b.Property<string>("MainImage")
                         .IsRequired()
@@ -230,102 +230,6 @@ namespace SupportMe.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("MercadopagoSetup");
-                });
-
-            modelBuilder.Entity("SupportMe.Models.PaymentComments", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Comment")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("PaymentId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("PaymentComments");
-                });
-
-            modelBuilder.Entity("SupportMe.Models.PaymentDetail", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<decimal>("Amount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("Brand")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("CampaignId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("CardHolderEmail")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CardHolderName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ChargeId")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Currency")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ErrorCode")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ErrorDescription")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("ExpirationMonth")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ExpirationYear")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Funding")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Installments")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Last4")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal>("NetReceivedAmount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<DateTime>("PaymentDateUTC")
-                        .HasColumnType("datetime2");
-
-                    b.Property<decimal?>("RefundedAmount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("TotalPaidAmount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("PaymentDetail");
                 });
 
             modelBuilder.Entity("SupportMe.Models.User", b =>

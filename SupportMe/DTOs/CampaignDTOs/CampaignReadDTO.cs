@@ -9,6 +9,8 @@
         public DateTime CreationDate { get; set; }
         public decimal? GoalAmount { get; set; }
         public DateTime? GoalDate { get; set; }
+        public string Category { get; set; }
         public List<string> Tags { get; set; }
+        public decimal Raised { get; set; }
     }
 }

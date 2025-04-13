@@ -16,6 +16,9 @@ namespace SupportMe.Models
         public DateTime? GoalDate { get; set; }
         public string UserId { get; set; }
         public int? CategoryId { get; set; }
+        public bool IsActive { get; set; }
+        [ForeignKey(nameof(CategoryId))]
+        public virtual Category? Category { get; set; }
         [ForeignKey(nameof(UserId))]
         public virtual User User { get; set; }
         public virtual List<CampaignTags> Tags { get; set; }

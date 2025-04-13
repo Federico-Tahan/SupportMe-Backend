@@ -48,15 +48,18 @@ namespace SupportMe.Services
 
             var response = new PaginationDTO<CampaignReadDTO>();
             response.Items = await campaignQuery
+                                    .Include(x => x.Category)
                                     .Select(x => new CampaignReadDTO 
                                     {
                                         Id = x.Id,
+                                        Category = x.Category != null ? x.Category.Name : null,
                                         CreationDate = x.CreationDate,
                                         Description = x.Description,
                                         GoalAmount = x.GoalAmount,
                                         GoalDate = x.GoalDate,
                                         MainImage = x.MainImage,
                                         Name = x.Name,
+                                        Raised = _context.PaymentDetail.Where(c => c.Status == Status.OK && c.CampaignId == x.Id).Select(x => x.NetReceivedAmount).Sum(),
                                         Tags = _context.CampaignTags.Where(c => c.CampaignId == x.Id).Select(x => x.Tag).ToList()
                                     }).ToListAsync();
             response.TotalRegisters = totalRegisters;
@@ -77,6 +80,23 @@ namespace SupportMe.Services
                                     await _fileUploadService.ProcessImageUrl(_S3BucketConfig.Bucket, _S3BucketConfig.CdnUrl, request.MainImage, resizeToMultipleSizes: false) :
                                     request.MainImage;
             campaign.MainImage = url;
+
+
+            if (request.Assets?.Count > 0)
+            {
+                List<GaleryAssets> assets = new List<GaleryAssets>();
+                foreach (var item in request.Assets)
+                {
+                    GaleryAssets assetsItem = new GaleryAssets();
+                    var imageUrl = !string.IsNullOrWhiteSpace(item.Base64) && !item.Base64.IsUrl() &&
+                                    ImageHelper.ValidateImageFormat(item.Base64) ?
+                                    await _fileUploadService.ProcessImageUrl(_S3BucketConfig.Bucket, _S3BucketConfig.CdnUrl, item.Base64, resizeToMultipleSizes: false) :
+                                    item.Base64;
+                    assetsItem.Asset = imageUrl;
+                    assets.Add(assetsItem);
+                }
+                campaign.Assets = assets;
+            }
 
             if (!request.Tags.IsNullOrEmpty())
             {

@@ -34,10 +34,9 @@ namespace SupportMe.Services
                 campaignQuery = campaignQuery.Where(x => x.UserId == userId);
             }
 
-
             if (filter.CategoryId != null) 
             {
-                
+                campaignQuery = campaignQuery.Where(x => x.CategoryId == filter.CategoryId);
             }
             if (!filter.TextFilter.IsNullOrEmpty())
             {
@@ -58,6 +57,7 @@ namespace SupportMe.Services
                                         GoalDate = x.GoalDate,
                                         MainImage = x.MainImage,
                                         Name = x.Name,
+                                        Tags = _context.CampaignTags.Where(c => c.CampaignId == x.Id).Select(x => x.Tag).ToList()
                                     }).ToListAsync();
             response.TotalRegisters = totalRegisters;
             return response;

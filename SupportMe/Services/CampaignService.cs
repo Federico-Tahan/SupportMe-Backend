@@ -70,6 +70,7 @@ namespace SupportMe.Services
         {
            
              var campaign = await _context.Campaigns
+                                    .Where(x => x.Id == id)
                                     .Include(x => x.Category)
                                     .Select(x => new CampaignReadDTO
                                     {
@@ -82,7 +83,8 @@ namespace SupportMe.Services
                                         MainImage = x.MainImage,
                                         Name = x.Name,
                                         Raised = _context.PaymentDetail.Where(c => c.Status == Status.OK && c.CampaignId == x.Id).Select(x => x.NetReceivedAmount).Sum(),
-                                        Tags = _context.CampaignTags.Where(c => c.CampaignId == x.Id).Select(x => x.Tag).ToList()
+                                        Tags = _context.CampaignTags.Where(c => c.CampaignId == x.Id).Select(x => x.Tag).ToList(),
+                                        Assets = _context.GaleryAssets.Where(c => c.AssetSoruceId == x.Id.ToString() && c.AssetSource == "CAMPAIGN").Select(x => x.Asset).ToList()
                                     }).FirstOrDefaultAsync();
             return campaign;
         }

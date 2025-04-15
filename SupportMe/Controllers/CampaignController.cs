@@ -27,6 +27,12 @@ namespace SupportMe.Controllers
             return Ok(campaigns);
         }
 
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetCampaignDonation([FromRoute] int id)
+        {
+            var campaigns = await _campaignService.GetCampaignDonationById(id);
+            return Ok(campaigns);
+        }
 
         [HttpPost]
         [Authorize]

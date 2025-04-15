@@ -65,6 +65,27 @@ namespace SupportMe.Services
             response.TotalRegisters = totalRegisters;
             return response;
         }
+
+        public async Task<CampaignReadDTO> GetCampaignDonationById(int id)
+        {
+           
+             var campaign = await _context.Campaigns
+                                    .Include(x => x.Category)
+                                    .Select(x => new CampaignReadDTO
+                                    {
+                                        Id = x.Id,
+                                        Category = x.Category != null ? x.Category.Name : null,
+                                        CreationDate = x.CreationDate,
+                                        Description = x.Description,
+                                        GoalAmount = x.GoalAmount,
+                                        GoalDate = x.GoalDate,
+                                        MainImage = x.MainImage,
+                                        Name = x.Name,
+                                        Raised = _context.PaymentDetail.Where(c => c.Status == Status.OK && c.CampaignId == x.Id).Select(x => x.NetReceivedAmount).Sum(),
+                                        Tags = _context.CampaignTags.Where(c => c.CampaignId == x.Id).Select(x => x.Tag).ToList()
+                                    }).FirstOrDefaultAsync();
+            return campaign;
+        }
         public async Task<string> CreateCampaign(CampaignWriteDTO request, string userId) 
         {
             Campaign campaign = new Campaign();

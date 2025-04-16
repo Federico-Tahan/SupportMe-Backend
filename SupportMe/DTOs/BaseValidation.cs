@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using SupportMe.Models;
+using System.Text.Json.Serialization;
 
 namespace SupportMe.DTOs
 {
@@ -13,20 +14,20 @@ namespace SupportMe.DTOs
             this.Error = ValidationError.NONE;
         }
 
-        //public BaseValidation(PaymentDetail paymentDetail)
-        //{
-        //    this.Status = ValidationStatusCode.PENDING;
-        //    if (paymentDetail.Status == Models.Status.OK)
-        //    {
-        //        Status = ValidationStatusCode.SUCCESS;
-        //    }
-        //    else if (paymentDetail.Status == Models.Status.ERROR)
-        //    {
-        //        Status = ValidationStatusCode.ERROR;
-        //    }
+        public BaseValidation(PaymentDetail paymentDetail)
+        {
+            this.Status = ValidationStatusCode.PENDING;
+            if (paymentDetail.Status == Models.Status.OK)
+            {
+                Status = ValidationStatusCode.SUCCESS;
+            }
+            else if (paymentDetail.Status == Models.Status.ERROR)
+            {
+                Status = ValidationStatusCode.ERROR;
+            }
 
-        //    Response = paymentDetail;
-        //}
+            Response = paymentDetail;
+        }
 
         public bool Success => this.Status == ValidationStatusCode.SUCCESS;
     }

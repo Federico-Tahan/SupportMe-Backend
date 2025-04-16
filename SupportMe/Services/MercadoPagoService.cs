@@ -32,6 +32,16 @@ namespace SupportMe.Services
             }
             return response;
         }
+
+        public async Task<PublicKeyMercadoPago> GetPublicKeyByCampaignId(int id)
+        {
+            var campaign = await _context.Campaigns.Where(x => x.Id == id).FirstOrDefaultAsync();
+            var token = await _context.UserMercadoPago.Where(x => x.UserId == campaign.UserId).FirstOrDefaultAsync();
+
+            PublicKeyMercadoPago response = new PublicKeyMercadoPago();
+            response.Token = token.public_key;
+            return response;
+        }
         public async Task<BaseValidation> ConnectOAuthAccount(string code, string userId)
         {
             BaseValidation response = new BaseValidation();

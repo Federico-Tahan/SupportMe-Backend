@@ -30,5 +30,11 @@ namespace SupportMe.Controllers
             var response = await _mp.DeleteToken(user.User.Id);
             return Ok(response);
         }
+        [HttpGet("public-key/{id}/campaign")]
+        public async Task<IActionResult> GetPublicKey([FromRoute] int id)
+        {
+            var response = await _mp.GetPublicKeyByCampaignId(id);
+            return Ok(response);
+        }
     }
 }

@@ -25,11 +25,22 @@ namespace SupportMe.Services
         {
             BaseValidation response = new BaseValidation();
             var campaign = await _context.Campaigns.Where(x => x.Id == id).FirstOrDefaultAsync();
-            var payment = await this.Payment(paymentInformation, campaign);
-            if (payment != null)
+
+            try
             {
-                response = await ProcessPaymentDetail(payment, paymentInformation, campaign.UserId);
+                var payment = await this.Payment(paymentInformation, campaign);
+
+                if (payment != null)
+                {
+                    response = await ProcessPaymentDetail(payment, paymentInformation, campaign.UserId);
+                }
+
             }
+            catch(Exception ex) 
+            {
+                response.Response = ex.Message;
+            }
+
             return response;
         }
 
@@ -62,14 +73,21 @@ namespace SupportMe.Services
                                                                             campaign.Name
                                                                         );
             processMercadoPagoPayment.application_fee = (decimal)(paymentInformation.Amount * 0.05m);
-
-            var apiResponse = await HttpClientHelper.PostAsync(mercadoPagoApi, processMercadoPagoPayment, headers: headers);
-            if (apiResponse is null)
+            try
             {
-                return null;
+                var apiResponse = await HttpClientHelper.PostAsync(mercadoPagoApi, processMercadoPagoPayment, headers: headers);
+                if (apiResponse is null)
+                {
+                    return null;
+                }
+                var response = JsonConvert.DeserializeObject<ProcessMercadoPagoPaymentResponse>(apiResponse);
+                return response;
             }
-            var response = JsonConvert.DeserializeObject<ProcessMercadoPagoPaymentResponse>(apiResponse);
-            return response;
+            catch (Exception ex) 
+            {
+                throw new Exception(ex.Message);
+            }
+           
         }
         private async Task<BaseValidation> ProcessPaymentDetail(ProcessMercadoPagoPaymentResponse payment, PaymentInformation paymentInfo, string campaignCreatorUserId)
         {

@@ -1,5 +1,7 @@
-﻿using Newtonsoft.Json;
+﻿using Azure;
+using Newtonsoft.Json;
 using System.Text;
+using static Google.Apis.Requests.BatchRequest;
 
 namespace SupportMe.Helpers
 {
@@ -66,12 +68,12 @@ namespace SupportMe.Helpers
                 catch (HttpRequestException ex)
                 {
                     Console.WriteLine($"Request failed: {ex.Message}");
-                    return null;
+                    throw new HttpRequestException(ex.Message);
                 }
                 catch (Exception ex)
                 {
                     Console.WriteLine($"Unexpected error: {ex.Message}");
-                    return null;
+                    throw new HttpRequestException(ex.Message);
                 }
             }
         }

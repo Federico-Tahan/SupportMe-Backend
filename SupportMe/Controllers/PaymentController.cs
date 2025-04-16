@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SupportMe.DTOs.PaymentDTOs;
+using SupportMe.MiddleWares;
 using SupportMe.Services;
 
 namespace SupportMe.Controllers
@@ -20,6 +22,14 @@ namespace SupportMe.Controllers
         public async Task<IActionResult> Payment([FromBody] PaymentInformation paymentInformation, [FromRoute] int id)
         {
             var response = await _paymentService.Pay(paymentInformation, id);
+            return Ok(response);
+        }
+        [HttpGet]
+        [Authorize]
+        public async Task<IActionResult> Payments()
+        {
+            UserMiddelware user = (UserMiddelware)HttpContext.Items["UserMiddelware"];
+            var response = await _paymentService.GetPayments(user.User.Id);
             return Ok(response);
         }
     }

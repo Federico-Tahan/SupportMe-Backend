@@ -7,6 +7,7 @@ using SupportMe.Models;
 using System.Net.NetworkInformation;
 using SupportMe.DTOs.MercadoPagoDTOs;
 using SupportMe.Data;
+using System.Collections.Generic;
 
 namespace SupportMe.Services
 {
@@ -32,7 +33,7 @@ namespace SupportMe.Services
 
                 if (payment != null)
                 {
-                    response = await ProcessPaymentDetail(payment, paymentInformation, campaign.UserId);
+                    response = await ProcessPaymentDetail(payment, paymentInformation, campaign.UserId, campaign.Id);
                 }
 
             }
@@ -89,7 +90,7 @@ namespace SupportMe.Services
             }
            
         }
-        private async Task<BaseValidation> ProcessPaymentDetail(ProcessMercadoPagoPaymentResponse payment, PaymentInformation paymentInfo, string campaignCreatorUserId)
+        private async Task<BaseValidation> ProcessPaymentDetail(ProcessMercadoPagoPaymentResponse payment, PaymentInformation paymentInfo, string campaignCreatorUserId, int campaignId)
         {
             PaymentDetail paymentDetail = new PaymentDetail();
             paymentDetail.Installments = payment.installments;
@@ -98,6 +99,7 @@ namespace SupportMe.Services
             paymentDetail.CardHolderEmail = paymentInfo.Card.CardHolderEmail;
             paymentDetail.CardHolderName = paymentInfo.Card.CardHolderName;
             paymentDetail.ChargeId = payment.id;
+            paymentDetail.CampaignId = campaignId;
             if (payment.status != MP_STATUS.rejected.ToString() && payment.status != MP_STATUS.approved.ToString() && payment.status != MP_STATUS.pending.ToString() && payment.status != MP_STATUS.in_process.ToString())
             {
                 throw new Exception("STATUS UNKNOWED");
@@ -250,5 +252,51 @@ namespace SupportMe.Services
                     break;
             }
         }
+
+        public async Task<PaymentLiveFeed> GetPayments(string userId) 
+        {
+
+            var query = _context.PaymentDetail.Include(x => x.Campaign).Where(x => x.Campaign.UserId == userId);
+
+
+
+
+            var statusCounts = await query
+                    .GroupBy(p => p.Status)
+                    .Select(g => new { Status = g.Key, Count = g.Count() })
+                    .ToDictionaryAsync(x => x.Status, x => x.Count);
+
+            var okRegisters = statusCounts.GetValueOrDefault(Status.OK, 0);
+            var errorRegisters = statusCounts.GetValueOrDefault(Status.ERROR, 0);
+            var refundRegisters = statusCounts.GetValueOrDefault(Status.REFUNDED, 0);
+            var total = okRegisters + errorRegisters + refundRegisters;
+            PaginationDTO<PaymentDetailRead> pag = new PaginationDTO<PaymentDetailRead>();
+
+
+            pag.Items = await query.Select(x => new PaymentDetailRead 
+            {
+                Campaign = new DTOs.CampaignDTOs.SimpleCampaignRead 
+                {
+                    Id = x.Campaign.Id,
+                    LogoUrl = x.Campaign.MainImage,
+                    Name = x.Campaign.Name,
+                },
+                Amount = x.Amount,
+                Brand = x.Brand,
+                Last4 = x.Last4,
+                PaymentDate = DateHelper.GetDateInZoneTime(x.PaymentDateUTC, "arg", -180),
+                Status = x.Status,
+            }).ToListAsync();
+
+            PaymentLiveFeed response = new PaymentLiveFeed();
+            response.Items = pag;
+            response.TotalRegisters = total;
+            response.TotalOk = okRegisters;
+            response.TotalError = errorRegisters;
+            response.TotalRefunded = refundRegisters;
+
+            return response;
+        }
+
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace SupportMe.Models
 {
@@ -28,6 +29,9 @@ namespace SupportMe.Models
         public DateTime PaymentDateUTC { get; set; }
         public string? UserId { get; set; }
         public int CampaignId { get; set; }
+        [ForeignKey(nameof(CampaignId))]
+        public virtual Campaign Campaign { get; set; }
+        [JsonConverter(typeof(JsonStringEnumConverter))]
         public enum ErrorCodes
         {
             UNKNOWN,
@@ -63,7 +67,6 @@ namespace SupportMe.Models
         }
     }
 
-
-
+    [JsonConverter(typeof(JsonStringEnumConverter))]
     public enum Status { OK, ERROR, REFUNDED }
 }

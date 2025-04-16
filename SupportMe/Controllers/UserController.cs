@@ -28,13 +28,13 @@ namespace SupportMe.Controllers
             var result = await _userService.RegisterUser(user);
             return Ok(result);
         }
-        [HttpGet("email")]
-        [AllowAnonymous]
-        public async Task<IActionResult> Email()
-        {
-            await _userService.SendEmail();
-            return Ok();
-        }
+        //[HttpGet("email")]
+        //[AllowAnonymous]
+        //public async Task<IActionResult> Email()
+        //{
+        //    await _userService.SendEmail();
+        //    return Ok();
+        //}
 
 
         [HttpPost("login")]

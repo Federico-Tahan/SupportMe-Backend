@@ -90,47 +90,67 @@ namespace SupportMe.Services
         }
         public async Task<string> CreateCampaign(CampaignWriteDTO request, string userId) 
         {
-            Campaign campaign = new Campaign();
-            campaign.CreationDate = DateTime.Now;
-            campaign.Name = request.Name;
-            campaign.Description = request.Description;
-            campaign.GoalDate = request.GoalDate;
-            campaign.GoalAmount = request.GoalAmount;
-            campaign.UserId = userId;
+            using var transaction = await _context.Database.BeginTransactionAsync();
 
-            var url = !string.IsNullOrWhiteSpace(request.MainImage) && !request.MainImage.IsUrl() &&
-                                    ImageHelper.ValidateImageFormat(request.MainImage) ? 
-                                    await _fileUploadService.ProcessImageUrl(_S3BucketConfig.Bucket, _S3BucketConfig.CdnUrl, request.MainImage, resizeToMultipleSizes: false) :
-                                    request.MainImage;
-            campaign.MainImage = url;
-
-
-            if (request.Assets?.Count > 0)
+            try
             {
-                List<GaleryAssets> assets = new List<GaleryAssets>();
-                foreach (var item in request.Assets)
+                Campaign campaign = new Campaign();
+                campaign.CreationDate = DateTime.Now;
+                campaign.Name = request.Name;
+                campaign.Description = request.Description;
+                campaign.GoalDate = request.GoalDate;
+                campaign.GoalAmount = request.GoalAmount;
+                campaign.UserId = userId;
+
+                var url = !string.IsNullOrWhiteSpace(request.MainImage) && !request.MainImage.IsUrl() &&
+                                        ImageHelper.ValidateImageFormat(request.MainImage) ?
+                                        await _fileUploadService.ProcessImageUrl(_S3BucketConfig.Bucket, _S3BucketConfig.CdnUrl, request.MainImage, resizeToMultipleSizes: false) :
+                                        request.MainImage;
+                campaign.MainImage = url;
+
+                if (!request.Tags.IsNullOrEmpty())
                 {
-                    GaleryAssets assetsItem = new GaleryAssets();
-                    var imageUrl = !string.IsNullOrWhiteSpace(item.Base64) && !item.Base64.IsUrl() &&
-                                    ImageHelper.ValidateImageFormat(item.Base64) ?
-                                    await _fileUploadService.ProcessImageUrl(_S3BucketConfig.Bucket, _S3BucketConfig.CdnUrl, item.Base64, resizeToMultipleSizes: false) :
-                                    item.Base64;
-                    assetsItem.Asset = imageUrl;
-                    assets.Add(assetsItem);
+                    List<CampaignTags> campaignTags = new List<CampaignTags>();
+                    campaignTags.AddRange(request.Tags.Select(x => new CampaignTags { Tag = x.Tag }).ToList());
+                    campaign.Tags = campaignTags;
                 }
-                campaign.Assets = assets;
-            }
 
-            if (!request.Tags.IsNullOrEmpty())
+                _context.Add(campaign);
+                await _context.SaveChangesAsync();
+
+
+                if (request.Assets?.Count > 0)
+                {
+                    List<GaleryAssets> assets = new List<GaleryAssets>();
+                    foreach (var item in request.Assets)
+                    {
+                        GaleryAssets assetsItem = new GaleryAssets();
+                        var imageUrl = !string.IsNullOrWhiteSpace(item.Base64) && !item.Base64.IsUrl() &&
+                                        ImageHelper.ValidateImageFormat(item.Base64) ?
+                                        await _fileUploadService.ProcessImageUrl(_S3BucketConfig.Bucket, _S3BucketConfig.CdnUrl, item.Base64, resizeToMultipleSizes: false) :
+                                        item.Base64;
+                        assetsItem.AssetSoruceId = campaign.Id.ToString();
+                        assetsItem.AssetSource = "CAMPAIGN";
+                        assetsItem.Asset = imageUrl;
+
+                        assets.Add(assetsItem);
+                    }
+                    _context.AddRange(assets);
+                    await _context.SaveChangesAsync();
+                }
+
+                await transaction.CommitAsync();
+
+                return url;
+            }
+            catch (Exception ex) 
             {
-                List<CampaignTags> campaignTags = new List<CampaignTags>();
-                campaignTags.AddRange(request.Tags.Select(x => new CampaignTags { Tag = x.Tag }).ToList());
-                campaign.Tags = campaignTags;
+                await transaction.RollbackAsync();
+
+                throw ex;
             }
 
-            _context.Add(campaign);
-            await _context.SaveChangesAsync();
-            return url;
+
         }
     }
 }

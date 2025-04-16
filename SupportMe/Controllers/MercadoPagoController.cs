@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SupportMe.MiddleWares;
 using SupportMe.Services;
@@ -17,6 +18,7 @@ namespace SupportMe.Controllers
         }
 
         [HttpPost("oauth/token/generate")]
+        [Authorize]
         public async Task<IActionResult> OAuthCreateToken([FromQuery] string code) 
         {
             UserMiddelware user = (UserMiddelware)HttpContext.Items["UserMiddelware"];
@@ -24,6 +26,7 @@ namespace SupportMe.Controllers
             return Ok(response);
         }
         [HttpDelete("oauth/token")]
+        [Authorize]
         public async Task<IActionResult> DeleteToken()
         {
             UserMiddelware user = (UserMiddelware)HttpContext.Items["UserMiddelware"];

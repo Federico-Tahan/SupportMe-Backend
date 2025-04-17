@@ -12,6 +12,7 @@
         public string Category { get; set; }
         public List<string> Tags { get; set; }
         public decimal Raised { get; set; }
+        public int? CategoryId { get; set; }
         public int DonationsCount { get; set; }
         public List<string> Assets { get; set; }
     }

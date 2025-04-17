@@ -84,6 +84,7 @@ namespace SupportMe.Services
                                         GoalDate = x.GoalDate,
                                         MainImage = x.MainImage,
                                         Name = x.Name,
+                                        CategoryId = x.CategoryId,
                                         Raised = _context.PaymentDetail.Where(c => c.Status == Status.OK && c.CampaignId == x.Id).Select(x => x.Amount).Sum(),
                                         DonationsCount = _context.PaymentDetail.Where(c => c.Status == Status.OK && c.CampaignId == x.Id).Count(),
                                         Tags = _context.CampaignTags.Where(c => c.CampaignId == x.Id).Select(x => x.Tag).ToList(),
@@ -107,7 +108,7 @@ namespace SupportMe.Services
                 }
                 campaign.GoalAmount = request.GoalAmount;
                 campaign.UserId = userId;
-
+                campaign.CategoryId = request.CategoryId;
                 var url = !string.IsNullOrWhiteSpace(request.MainImage) && !request.MainImage.IsUrl() &&
                                         ImageHelper.ValidateImageFormat(request.MainImage) ?
                                         await _fileUploadService.ProcessImageUrl(_S3BucketConfig.Bucket, _S3BucketConfig.CdnUrl, request.MainImage, resizeToMultipleSizes: false) :
@@ -150,6 +151,73 @@ namespace SupportMe.Services
                 return url;
             }
             catch (Exception ex) 
+            {
+                await transaction.RollbackAsync();
+
+                throw ex;
+            }
+        }
+
+
+        public async Task<string> UpdateCampaign(CampaignWriteDTO request, string userId)
+        {
+            using var transaction = await _context.Database.BeginTransactionAsync();
+
+            try
+            {
+                var campaignDB = await _context.Campaigns.FirstOrDefaultAsync(x => x.Id == request.Id.Value && x.UserId == userId);
+                campaignDB.Name = request.Name;
+                campaignDB.Description = request.Description;
+                if (request.GoalDate.HasValue)
+                {
+                    campaignDB.GoalDate = DateHelper.GetUTCDateFromLocalDate(request.GoalDate.Value, "ARG", 180);
+                }
+                campaignDB.GoalAmount = request.GoalAmount;
+                campaignDB.CategoryId = request.CategoryId;
+                var url = !string.IsNullOrWhiteSpace(request.MainImage) && !request.MainImage.IsUrl() &&
+                                        ImageHelper.ValidateImageFormat(request.MainImage) ?
+                                        await _fileUploadService.ProcessImageUrl(_S3BucketConfig.Bucket, _S3BucketConfig.CdnUrl, request.MainImage, resizeToMultipleSizes: false) :
+                                        request.MainImage;
+                campaignDB.MainImage = url;
+                await _context.CampaignTags.Where(x => x.CampaignId == campaignDB.Id).ExecuteDeleteAsync();
+
+                if (!request.Tags.IsNullOrEmpty())
+                {
+                    List<CampaignTags> campaignTags = new List<CampaignTags>();
+                    campaignTags.AddRange(request.Tags.Select(x => new CampaignTags { Tag = x.Tag }).ToList());
+                    campaignDB.Tags = campaignTags;
+                }
+
+                _context.Update(campaignDB);
+                await _context.SaveChangesAsync();
+
+                await _context.GaleryAssets.Where(x => x.AssetSource == "CAMPAIGN" && x.AssetSoruceId == campaignDB.Id.ToString()).ExecuteDeleteAsync();
+
+                if (request.Assets?.Count > 0)
+                {
+                    List<GaleryAssets> assets = new List<GaleryAssets>();
+                    foreach (var item in request.Assets)
+                    {
+                        GaleryAssets assetsItem = new GaleryAssets();
+                        var imageUrl = !string.IsNullOrWhiteSpace(item.Base64) && !item.Base64.IsUrl() &&
+                                        ImageHelper.ValidateImageFormat(item.Base64) ?
+                                        await _fileUploadService.ProcessImageUrl(_S3BucketConfig.Bucket, _S3BucketConfig.CdnUrl, item.Base64, resizeToMultipleSizes: false) :
+                                        item.Base64;
+                        assetsItem.AssetSoruceId = campaignDB.Id.ToString();
+                        assetsItem.AssetSource = "CAMPAIGN";
+                        assetsItem.Asset = imageUrl;
+
+                        assets.Add(assetsItem);
+                    }
+                    _context.AddRange(assets);
+                    await _context.SaveChangesAsync();
+                }
+
+                await transaction.CommitAsync();
+
+                return url;
+            }
+            catch (Exception ex)
             {
                 await transaction.RollbackAsync();
 

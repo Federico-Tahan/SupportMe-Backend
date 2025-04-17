@@ -43,5 +43,14 @@ namespace SupportMe.Controllers
             var result = await _campaignService.CreateCampaign(request, user.User.Id);
             return Ok(result);
         }
+        [HttpPut]
+        [Authorize]
+        public async Task<IActionResult> UpdateCampaign([FromBody] CampaignWriteDTO request)
+        {
+            UserMiddelware user = (UserMiddelware)HttpContext.Items["UserMiddelware"];
+
+            var result = await _campaignService.UpdateCampaign(request, user.User.Id);
+            return Ok(result);
+        }
     }
 }

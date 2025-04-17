@@ -41,7 +41,7 @@ namespace SupportMe.Controllers
             UserMiddelware user = (UserMiddelware)HttpContext.Items["UserMiddelware"];
 
             var result = await _campaignService.CreateCampaign(request, user.User.Id);
-            return Ok(result);
+            return Ok();
         }
         [HttpPut]
         [Authorize]
@@ -50,6 +50,19 @@ namespace SupportMe.Controllers
             UserMiddelware user = (UserMiddelware)HttpContext.Items["UserMiddelware"];
 
             var result = await _campaignService.UpdateCampaign(request, user.User.Id);
+            return Ok();
+        }
+
+        [HttpGet("{id}/donations/recents")]
+        public async Task<IActionResult> GetDonationsRecents([FromQuery]BaseFilter filter, [FromRoute] int id)
+        {
+            var result = await _campaignService.GetDonationsByCampaignId(id, filter, "recents");
+            return Ok(result);
+        }
+        [HttpGet("{id}/donations/top")]
+        public async Task<IActionResult> GetDonationsTOP([FromQuery] BaseFilter filter, [FromRoute] int id)
+        {
+            var result = await _campaignService.GetDonationsByCampaignId(id, filter, "amount");
             return Ok(result);
         }
     }

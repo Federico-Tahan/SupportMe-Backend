@@ -4,6 +4,7 @@ using Microsoft.IdentityModel.Tokens;
 using SupportMe.Data;
 using SupportMe.DTOs;
 using SupportMe.DTOs.CampaignDTOs;
+using SupportMe.DTOs.DonationDTOs;
 using SupportMe.DTOs.FileUploadDTOs;
 using SupportMe.Helpers;
 using SupportMe.Models;
@@ -91,6 +92,46 @@ namespace SupportMe.Services
                                         Assets = _context.GaleryAssets.Where(c => c.AssetSoruceId == x.Id.ToString() && c.AssetSource == "CAMPAIGN").Select(x => x.Asset).ToList()
                                     }).FirstOrDefaultAsync();
             return campaign;
+        }
+
+        public async Task<PaginationDTO<SimpleDonation>> GetDonationsByCampaignId(int id, BaseFilter filter, string sortStr)
+        {
+            var query = _context.PaymentDetail.Where(x => x.CampaignId == id && x.Status == Status.OK).AsQueryable();
+
+            var count = await query.CountAsync();
+
+            List<SortingDTO> sorting = new List<SortingDTO>();
+
+            if (sortStr == "amount")
+            {
+                SortingDTO sort = new SortingDTO();
+                sort.SortBy = Models.Enums.SORTBY.DESC;
+                sort.Field = "amount";
+                sorting.Add(sort);
+            }
+            else
+            {
+                SortingDTO sort = new SortingDTO();
+                sort.SortBy = Models.Enums.SORTBY.DESC;
+                sort.Field = "paymentDateUTC";
+                sorting.Add(sort);
+            }
+
+
+            filter.Sorting = sorting;
+            query = SortingHelper.ApplyMultipleSortingAndPagination(query, filter, true);
+
+            var response = await query.Select(x => new SimpleDonation
+                                         {
+                                             DonatorName = x.CardHolderName,
+                                             Amount = x.Amount,
+                                             Date = DateHelper.GetDateInZoneTime(x.PaymentDateUTC, "ARG", 180)
+                                         }).ToListAsync();
+
+            PaginationDTO<SimpleDonation> pagination = new PaginationDTO<SimpleDonation>();
+            pagination.Items = response;
+            pagination.TotalRegisters = count;
+            return pagination;
         }
         public async Task<string> CreateCampaign(CampaignWriteDTO request, string userId) 
         {

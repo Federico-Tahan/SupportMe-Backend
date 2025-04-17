@@ -26,10 +26,10 @@ namespace SupportMe.Controllers
         }
         [HttpGet]
         [Authorize]
-        public async Task<IActionResult> Payments()
+        public async Task<IActionResult> Payments([FromQuery] PaymentFilter filter)
         {
             UserMiddelware user = (UserMiddelware)HttpContext.Items["UserMiddelware"];
-            var response = await _paymentService.GetPayments(user.User.Id);
+            var response = await _paymentService.GetPayments(user.User.Id, filter);
             return Ok(response);
         }
     }

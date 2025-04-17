@@ -8,6 +8,7 @@ namespace SupportMe.DTOs.PaymentDTOs
         public decimal Amount { get; set; }
         public Status Status { get; set; }
         public string Last4 { get; set; }
+        public string CustomerName { get; set; }
         public string Brand { get; set; }
         public SimpleCampaignRead Campaign { get; set; }
         public DateTime PaymentDate { get; set; }

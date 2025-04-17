@@ -8,6 +8,7 @@ using System.Net.NetworkInformation;
 using SupportMe.DTOs.MercadoPagoDTOs;
 using SupportMe.Data;
 using System.Collections.Generic;
+using Microsoft.IdentityModel.Tokens;
 
 namespace SupportMe.Services
 {
@@ -253,13 +254,33 @@ namespace SupportMe.Services
             }
         }
 
-        public async Task<PaymentLiveFeed> GetPayments(string userId) 
+        public async Task<PaymentLiveFeed> GetPayments(string userId, PaymentFilter filter) 
         {
+
+            DateTime? from = filter.From.HasValue ? DateHelper.GetUTCDateFromLocalDate(filter.From.Value, "ARS", 180) : null;
+            DateTime? to = filter.To.HasValue ? DateHelper.GetUTCDateFromLocalDate(filter.To.Value.AddDays(1).AddSeconds(-1), "ARS", 180) : null;
 
             var query = _context.PaymentDetail.Include(x => x.Campaign).Where(x => x.Campaign.UserId == userId);
 
+            if (from.HasValue)
+            {
+                query = query.Where(x => x.PaymentDateUTC >= from.Value);
+            }
 
+            if (to.HasValue)
+            {
+                query = query.Where(x => x.PaymentDateUTC <= to.Value);
+            }
 
+            if (!filter.Brand.IsNullOrEmpty()) 
+            {
+                query = query.Where(x => filter.Brand.Contains(x.Brand));
+            }
+
+            if (!filter.CampaignId.IsNullOrEmpty())
+            {
+                query = query.Where(x => filter.CampaignId.Contains(x.CampaignId));
+            }
 
             var statusCounts = await query
                     .GroupBy(p => p.Status)
@@ -270,6 +291,13 @@ namespace SupportMe.Services
             var errorRegisters = statusCounts.GetValueOrDefault(Status.ERROR, 0);
             var refundRegisters = statusCounts.GetValueOrDefault(Status.REFUNDED, 0);
             var total = okRegisters + errorRegisters + refundRegisters;
+
+            if (!filter.Status.IsNullOrEmpty())
+            {
+                query = query.Where(x => filter.Status.Contains(x.Status));
+            }
+
+            query = SortingHelper.ApplyMultipleSortingAndPagination(query, filter, true);
             PaginationDTO<PaymentDetailRead> pag = new PaginationDTO<PaymentDetailRead>();
 
 
@@ -283,8 +311,9 @@ namespace SupportMe.Services
                 },
                 Amount = x.Amount,
                 Brand = x.Brand,
+                CustomerName = x.CardHolderName,
                 Last4 = x.Last4,
-                PaymentDate = DateHelper.GetDateInZoneTime(x.PaymentDateUTC, "arg", -180),
+                PaymentDate = DateHelper.GetDateInZoneTime(x.PaymentDateUTC, "arg", 180),
                 Status = x.Status,
             }).ToListAsync();
 

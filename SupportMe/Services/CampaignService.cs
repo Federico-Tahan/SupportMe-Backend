@@ -49,6 +49,7 @@ namespace SupportMe.Services
             var response = new PaginationDTO<CampaignReadDTO>();
             response.Items = await campaignQuery
                                     .Include(x => x.Category)
+                                    .Include(x => !x.GoalDate.HasValue || x.GoalDate.Value >= DateTime.UtcNow)
                                     .Select(x => new CampaignReadDTO 
                                     {
                                         Id = x.Id,
@@ -56,10 +57,10 @@ namespace SupportMe.Services
                                         CreationDate = x.CreationDate,
                                         Description = x.Description,
                                         GoalAmount = x.GoalAmount,
-                                        GoalDate = x.GoalDate,
+                                        GoalDate = x.GoalDate.HasValue ? DateHelper.GetDateInZoneTime(x.GoalDate.Value, "ARG", -180) : null,
                                         MainImage = x.MainImage,
                                         Name = x.Name,
-                                        Raised = _context.PaymentDetail.Where(c => c.Status == Status.OK && c.CampaignId == x.Id).Select(x => x.NetReceivedAmount).Sum(),
+                                        Raised = _context.PaymentDetail.Where(c => c.Status == Status.OK && c.CampaignId == x.Id).Select(x => x.TotalPaidAmount).Sum(),
                                         Tags = _context.CampaignTags.Where(c => c.CampaignId == x.Id).Select(x => x.Tag).ToList()
                                     }).ToListAsync();
             response.TotalRegisters = totalRegisters;
@@ -82,7 +83,7 @@ namespace SupportMe.Services
                                         GoalDate = x.GoalDate,
                                         MainImage = x.MainImage,
                                         Name = x.Name,
-                                        Raised = _context.PaymentDetail.Where(c => c.Status == Status.OK && c.CampaignId == x.Id).Select(x => x.NetReceivedAmount).Sum(),
+                                        Raised = _context.PaymentDetail.Where(c => c.Status == Status.OK && c.CampaignId == x.Id).Select(x => x.Amount).Sum(),
                                         Tags = _context.CampaignTags.Where(c => c.CampaignId == x.Id).Select(x => x.Tag).ToList(),
                                         Assets = _context.GaleryAssets.Where(c => c.AssetSoruceId == x.Id.ToString() && c.AssetSource == "CAMPAIGN").Select(x => x.Asset).ToList()
                                     }).FirstOrDefaultAsync();
@@ -98,7 +99,10 @@ namespace SupportMe.Services
                 campaign.CreationDate = DateTime.Now;
                 campaign.Name = request.Name;
                 campaign.Description = request.Description;
-                campaign.GoalDate = request.GoalDate;
+                if (request.GoalDate.HasValue)
+                {
+                    campaign.GoalDate = DateHelper.GetUTCDateFromLocalDate(request.GoalDate.Value, "ARG", -180);
+                }
                 campaign.GoalAmount = request.GoalAmount;
                 campaign.UserId = userId;
 

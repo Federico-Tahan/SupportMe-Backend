@@ -29,12 +29,16 @@ namespace SupportMe.Services
         public async Task<PaginationDTO<CampaignReadDTO>> GetCampaigns(CampaignFilter filter, string? userId) 
         {
             var campaignQuery = _context.Campaigns
-                                        .Where(x => !x.GoalDate.HasValue || x.GoalDate.Value >= DateTime.UtcNow)
+                                        .Where(x => !filter.OnlyActive || x.IsActive)
                                         .AsQueryable();
 
             if (!userId.IsNullOrEmpty()) 
             {
                 campaignQuery = campaignQuery.Where(x => x.UserId == userId);
+            }
+            else 
+            {
+                campaignQuery = campaignQuery.Where(x => !x.GoalDate.HasValue || x.GoalDate.Value >= DateTime.UtcNow);
             }
 
             if (filter.CategoryId != null) 

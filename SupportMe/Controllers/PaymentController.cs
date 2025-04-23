@@ -21,7 +21,10 @@ namespace SupportMe.Controllers
         [HttpPost("{id}/campaign")]
         public async Task<IActionResult> Payment([FromBody] PaymentInformation paymentInformation, [FromRoute] int id)
         {
-            var response = await _paymentService.Pay(paymentInformation, id);
+            UserMiddelware user = (UserMiddelware)HttpContext.Items["UserMiddelware"];
+            string? userId = user != null && user.User != null ? user.User.Id : null;
+
+            var response = await _paymentService.Pay(paymentInformation, id, userId);
             return Ok(response);
         }
         [HttpGet]
@@ -30,6 +33,13 @@ namespace SupportMe.Controllers
         {
             UserMiddelware user = (UserMiddelware)HttpContext.Items["UserMiddelware"];
             var response = await _paymentService.GetPayments(user.User.Id, filter);
+            return Ok(response);
+        }
+
+        [HttpGet("{chargeId}/donation")]
+        public async Task<IActionResult> GetSimplePaymentByChargeId([FromRoute] string chargeId)
+        {
+            var response = await _paymentService.GetPayments(chargeId);
             return Ok(response);
         }
     }

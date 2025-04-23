@@ -9,6 +9,7 @@ using SupportMe.DTOs.MercadoPagoDTOs;
 using SupportMe.Data;
 using System.Collections.Generic;
 using Microsoft.IdentityModel.Tokens;
+using SupportMe.DTOs.DonationDTOs;
 
 namespace SupportMe.Services
 {
@@ -23,7 +24,7 @@ namespace SupportMe.Services
             _configuration = configuration;
         }
 
-        public async Task<BaseValidation> Pay(PaymentInformation paymentInformation, int id)
+        public async Task<BaseValidation> Pay(PaymentInformation paymentInformation, int id, string? userId)
         {
             BaseValidation response = new BaseValidation();
             var campaign = await _context.Campaigns.Where(x => x.Id == id).FirstOrDefaultAsync();
@@ -34,7 +35,7 @@ namespace SupportMe.Services
 
                 if (payment != null)
                 {
-                    response = await ProcessPaymentDetail(payment, paymentInformation, campaign.UserId, campaign.Id);
+                    response = await ProcessPaymentDetail(payment, paymentInformation, campaign.UserId, campaign.Id, userId);
                 }
 
             }
@@ -91,7 +92,7 @@ namespace SupportMe.Services
             }
            
         }
-        private async Task<BaseValidation> ProcessPaymentDetail(ProcessMercadoPagoPaymentResponse payment, PaymentInformation paymentInfo, string campaignCreatorUserId, int campaignId)
+        private async Task<BaseValidation> ProcessPaymentDetail(ProcessMercadoPagoPaymentResponse payment, PaymentInformation paymentInfo, string campaignCreatorUserId, int campaignId, string? userId)
         {
             PaymentDetail paymentDetail = new PaymentDetail();
             paymentDetail.Installments = payment.installments;
@@ -100,6 +101,7 @@ namespace SupportMe.Services
             paymentDetail.CardHolderEmail = paymentInfo.Card.CardHolderEmail;
             paymentDetail.CardHolderName = paymentInfo.Card.CardHolderName;
             paymentDetail.ChargeId = payment.id;
+            paymentDetail.UserId = userId;
             paymentDetail.CampaignId = campaignId;
             if (payment.status != MP_STATUS.rejected.ToString() && payment.status != MP_STATUS.approved.ToString() && payment.status != MP_STATUS.pending.ToString() && payment.status != MP_STATUS.in_process.ToString())
             {
@@ -138,6 +140,16 @@ namespace SupportMe.Services
             }
             _context.Add(paymentDetail);
             await _context.SaveChangesAsync();
+
+            if (string.IsNullOrEmpty(paymentInfo.Description)) 
+            {
+                PaymentComments comment = new PaymentComments();
+                comment.Comment = paymentInfo.Description;
+                comment.PaymentId = paymentDetail.Id;
+                _context.Add(comment);
+                await _context.SaveChangesAsync();
+            }
+
             BaseValidation response = new BaseValidation(paymentDetail);
 
             return response;
@@ -257,8 +269,8 @@ namespace SupportMe.Services
         public async Task<PaymentLiveFeed> GetPayments(string userId, PaymentFilter filter) 
         {
 
-            DateTime? from = filter.From.HasValue ? DateHelper.GetUTCDateFromLocalDate(filter.From.Value, "ARS", 180) : null;
-            DateTime? to = filter.To.HasValue ? DateHelper.GetUTCDateFromLocalDate(filter.To.Value.AddDays(1).AddSeconds(-1), "ARS", 180) : null;
+            DateTime? from = filter.From.HasValue ? DateHelper.GetUTCDateFromLocalDate(filter.From.Value, "ARS", -180) : null;
+            DateTime? to = filter.To.HasValue ? DateHelper.GetUTCDateFromLocalDate(filter.To.Value.AddDays(1).AddSeconds(-1), "ARS", -180) : null;
 
             var query = _context.PaymentDetail.Include(x => x.Campaign).Where(x => x.Campaign.UserId == userId);
 
@@ -313,7 +325,7 @@ namespace SupportMe.Services
                 Brand = x.Brand,
                 CustomerName = x.CardHolderName,
                 Last4 = x.Last4,
-                PaymentDate = DateHelper.GetDateInZoneTime(x.PaymentDateUTC, "arg", 180),
+                PaymentDate = DateHelper.GetDateInZoneTime(x.PaymentDateUTC, "arg", -180),
                 Status = x.Status,
             }).ToListAsync();
 
@@ -326,6 +338,11 @@ namespace SupportMe.Services
 
             return response;
         }
-
+        public async Task<SimpleDonation> GetPayments(string chargeId)
+        {
+            var response = await _context.PaymentDetail.Include(x => x.Campaign).Where(x => x.ChargeId == chargeId)
+                .Select(x => new SimpleDonation { Amount = x.Amount, CampaignName = x.Campaign.Name, DonatorName = x.CardHolderName }).FirstOrDefaultAsync();
+            return response;
+        }
     }
 }

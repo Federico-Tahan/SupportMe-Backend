@@ -63,7 +63,7 @@ namespace SupportMe.Services
                                         CreationDate = x.CreationDate,
                                         Description = x.Description,
                                         GoalAmount = x.GoalAmount,
-                                        GoalDate = x.GoalDate.HasValue ? DateHelper.GetDateInZoneTime(x.GoalDate.Value, "ARG", 180) : null,
+                                        GoalDate = x.GoalDate.HasValue ? DateHelper.GetDateInZoneTime(x.GoalDate.Value, "ARG", -180) : null,
                                         MainImage = x.MainImage,
                                         Name = x.Name,
                                         Raised = _context.PaymentDetail.Where(c => c.Status == Status.OK && c.CampaignId == x.Id).Select(x => x.TotalPaidAmount).Sum(),
@@ -129,7 +129,7 @@ namespace SupportMe.Services
                                          {
                                              DonatorName = x.CardHolderName,
                                              Amount = x.Amount,
-                                             Date = DateHelper.GetDateInZoneTime(x.PaymentDateUTC, "ARG", 180)
+                                             Date = DateHelper.GetDateInZoneTime(x.PaymentDateUTC, "ARG", -180)
                                          }).ToListAsync();
 
             PaginationDTO<SimpleDonation> pagination = new PaginationDTO<SimpleDonation>();
@@ -147,9 +147,10 @@ namespace SupportMe.Services
                 campaign.CreationDate = DateTime.Now;
                 campaign.Name = request.Name;
                 campaign.Description = request.Description;
+                campaign.IsActive = true;
                 if (request.GoalDate.HasValue)
                 {
-                    campaign.GoalDate = DateHelper.GetUTCDateFromLocalDate(request.GoalDate.Value, "ARG", 180);
+                    campaign.GoalDate = DateHelper.GetUTCDateFromLocalDate(request.GoalDate.Value, "ARG", -180);
                 }
                 campaign.GoalAmount = request.GoalAmount;
                 campaign.UserId = userId;
@@ -215,7 +216,7 @@ namespace SupportMe.Services
                 campaignDB.Description = request.Description;
                 if (request.GoalDate.HasValue)
                 {
-                    campaignDB.GoalDate = DateHelper.GetUTCDateFromLocalDate(request.GoalDate.Value, "ARG", 180);
+                    campaignDB.GoalDate = DateHelper.GetUTCDateFromLocalDate(request.GoalDate.Value, "ARG", -180);
                 }
                 campaignDB.GoalAmount = request.GoalAmount;
                 campaignDB.CategoryId = request.CategoryId;

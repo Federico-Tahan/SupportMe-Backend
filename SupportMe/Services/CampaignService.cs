@@ -6,6 +6,7 @@ using SupportMe.DTOs;
 using SupportMe.DTOs.CampaignDTOs;
 using SupportMe.DTOs.DonationDTOs;
 using SupportMe.DTOs.FileUploadDTOs;
+using SupportMe.DTOs.SupportMessageDTOs;
 using SupportMe.Helpers;
 using SupportMe.Models;
 
@@ -95,6 +96,22 @@ namespace SupportMe.Services
                                         Tags = _context.CampaignTags.Where(c => c.CampaignId == x.Id).Select(x => x.Tag).ToList(),
                                         Assets = _context.GaleryAssets.Where(c => c.AssetSoruceId == x.Id.ToString() && c.AssetSource == "CAMPAIGN").Select(x => x.Asset).ToList()
                                     }).FirstOrDefaultAsync();
+
+            if (campaign != null) 
+            {
+                var supportMessages = await _context.PaymentComments
+                    .Join(_context.PaymentDetail, pc => pc.PaymentId, pd => pd.Id, (pc, pd) => new { PaymentDetail = pd, PaymentComment = pc })
+                    .Where(x => x.PaymentDetail.CampaignId == campaign.Id)
+                    .Select(x => new SupportMessage 
+                    {
+                        Date = DateHelper.GetDateInZoneTime(x.PaymentDetail.PaymentDateUTC, "ARG", -180),
+                        Message = x.PaymentComment.Comment,
+                        Name = x.PaymentDetail.CardHolderName
+                    })
+                    .ToListAsync();
+                campaign.SupportMessages = supportMessages;
+            }
+
             return campaign;
         }
 

@@ -1,4 +1,6 @@
-﻿namespace SupportMe.DTOs.CampaignDTOs
+﻿using SupportMe.DTOs.SupportMessageDTOs;
+
+namespace SupportMe.DTOs.CampaignDTOs
 {
     public class CampaignReadDTO
     {
@@ -15,5 +17,6 @@
         public int? CategoryId { get; set; }
         public int DonationsCount { get; set; }
         public List<string> Assets { get; set; }
+        public List<SupportMessage> SupportMessages { get; set; }
     }
 }

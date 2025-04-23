@@ -141,7 +141,7 @@ namespace SupportMe.Services
             _context.Add(paymentDetail);
             await _context.SaveChangesAsync();
 
-            if (string.IsNullOrEmpty(paymentInfo.Description)) 
+            if (!string.IsNullOrEmpty(paymentInfo.Description)) 
             {
                 PaymentComments comment = new PaymentComments();
                 comment.Comment = paymentInfo.Description;

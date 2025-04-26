@@ -21,6 +21,7 @@ namespace SupportMe.Data
         public DbSet<CampaignTags> CampaignTags { get; set; }
         public DbSet<PaymentDetail> PaymentDetail { get; set; }
         public DbSet<PaymentComments> PaymentComments { get; set; }
+        public DbSet<CampaignView> CampaignView { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         { 

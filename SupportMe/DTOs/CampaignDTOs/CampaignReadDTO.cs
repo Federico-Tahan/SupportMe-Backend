@@ -12,6 +12,7 @@ namespace SupportMe.DTOs.CampaignDTOs
         public decimal? GoalAmount { get; set; }
         public DateTime? GoalDate { get; set; }
         public string Category { get; set; }
+        public int Views { get; set; }
         public List<string> Tags { get; set; }
         public decimal Raised { get; set; }
         public int? CategoryId { get; set; }

@@ -90,6 +90,7 @@ namespace SupportMe.Services
                                         GoalDate = x.GoalDate,
                                         MainImage = x.MainImage,
                                         Name = x.Name,
+                                        Views = _context.CampaignView.Where(c => c.CampaignId == x.Id).Count(),
                                         CategoryId = x.CategoryId,
                                         Raised = _context.PaymentDetail.Where(c => c.Status == Status.OK && c.CampaignId == x.Id).Select(x => x.Amount).Sum(),
                                         DonationsCount = _context.PaymentDetail.Where(c => c.Status == Status.OK && c.CampaignId == x.Id).Count(),
@@ -221,6 +222,14 @@ namespace SupportMe.Services
             }
         }
 
+        public async Task View(int campaignId)
+        {
+            CampaignView view = new CampaignView();
+            view.CampaignId = campaignId;
+            view.DateUTC = DateTime.UtcNow;
+            _context.Add(view);
+            await _context.SaveChangesAsync();
+        }
 
         public async Task<string> UpdateCampaign(CampaignWriteDTO request, string userId)
         {
@@ -286,8 +295,6 @@ namespace SupportMe.Services
 
                 throw ex;
             }
-
-
         }
     }
 }

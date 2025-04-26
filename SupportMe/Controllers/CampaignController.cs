@@ -65,5 +65,11 @@ namespace SupportMe.Controllers
             var result = await _campaignService.GetDonationsByCampaignId(id, filter, "amount");
             return Ok(result);
         }
+        [HttpGet("{id}/view")]
+        public async Task<IActionResult> View([FromRoute] int id)
+        {
+            await _campaignService.View(id);
+            return Ok();
+        }
     }
 }

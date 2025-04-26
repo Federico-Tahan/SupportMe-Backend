@@ -322,6 +322,7 @@ namespace SupportMe.Services
                     Name = x.Campaign.Name,
                 },
                 Amount = x.Amount,
+                ChargeId = x.ChargeId,
                 Brand = x.Brand,
                 CustomerName = x.CardHolderName,
                 Last4 = x.Last4,

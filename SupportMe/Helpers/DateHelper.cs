@@ -272,6 +272,20 @@
             }
         }
         public enum DatePart { HOUR, DAY, MONTH, YEAR, }
+        public static void SetFromToDate(DateTime? filterFrom, DateTime? filterTo, out DateTime? from, out DateTime? to)
+        {
+            from = filterFrom;
+            to = filterTo.HasValue ? filterTo.Value.AddHours(23).AddMinutes(59).AddSeconds(59) : null;
+        }
+        public static void SetUTCFromToDate(DateTime? from, DateTime? to, out DateTime? fromUTCDate, out DateTime? toUTCDate, string TimeZone, int? UTCOffset)
+        {
+            DateTime? fromLocal = null;
+            DateTime? toLocal = null;
 
+
+            SetFromToDate(from, to, out fromLocal, out toLocal);
+            fromUTCDate = fromLocal != null ? GetUTCDateFromLocalDate(fromLocal.Value, TimeZone, UTCOffset) : null;
+            toUTCDate = toLocal != null ? GetUTCDateFromLocalDate(toLocal.Value, TimeZone, UTCOffset) : null;
+        }
     }
 }

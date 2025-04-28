@@ -27,6 +27,15 @@ namespace SupportMe.Controllers
             return Ok(campaigns);
         }
 
+        [HttpGet("simple")]
+        [Authorize]
+        public async Task<IActionResult> GetSimpleCampaigns()
+        {
+            UserMiddelware user = (UserMiddelware)HttpContext.Items["UserMiddelware"];
+            var campaigns = await _campaignService.GetSimpleCampaigns(user.User.Id);
+            return Ok(campaigns);
+        }
+
         [HttpGet("{id}")]
         public async Task<IActionResult> GetCampaignDonation([FromRoute] int id)
         {

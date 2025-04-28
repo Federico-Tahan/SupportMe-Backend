@@ -74,6 +74,19 @@ namespace SupportMe.Services
             return response;
         }
 
+        public async Task<List<SimpleCampaignRead>> GetSimpleCampaigns(string userId)
+        {
+            var campaignQuery = await _context.Campaigns
+                                        .Where(x => x.UserId == userId)
+                                        .Select(x => new SimpleCampaignRead 
+                                        {
+                                            Name = x.Name,
+                                            Id = x.Id,
+                                            LogoUrl = x.MainImage
+                                        })
+                                        .ToListAsync();
+            return campaignQuery;
+        }
         public async Task<CampaignReadDTO> GetCampaignDonationById(int id)
         {
            

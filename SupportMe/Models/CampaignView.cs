@@ -10,5 +10,7 @@ namespace SupportMe.Models
         public int Id { get; set; }
         public DateTime DateUTC { get; set; }
         public int CampaignId { get; set; }
+        [ForeignKey("CampaignId")]
+        public virtual Campaign Campaign { get; set; }
     }
 }

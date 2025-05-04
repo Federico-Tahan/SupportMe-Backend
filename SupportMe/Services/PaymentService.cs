@@ -16,12 +16,14 @@ namespace SupportMe.Services
     public class PaymentService
     {
         private readonly DataContext _context;
+        private readonly NotificationService _notificationService;
         private readonly IConfiguration _configuration;
 
-        public PaymentService(DataContext context, IConfiguration configuration)
+        public PaymentService(DataContext context, IConfiguration configuration, NotificationService notification)
         {
             _context = context;
             _configuration = configuration;
+            _notificationService = notification;
         }
 
         public async Task<BaseValidation> Pay(PaymentInformation paymentInformation, int id, string? userId)
@@ -36,6 +38,12 @@ namespace SupportMe.Services
                 if (payment != null)
                 {
                     response = await ProcessPaymentDetail(payment, paymentInformation, campaign.UserId, campaign.Id, userId);
+
+                    if (response.Success)
+                    {
+                        await _notificationService.SendDonationToOwner(response.Response.ChargeId);
+
+                    }
                 }
 
             }

@@ -134,6 +134,7 @@ builder.Services.AddScoped<MercadoPagoService>();
 builder.Services.AddScoped<SetupService>();
 builder.Services.AddScoped<PaymentService>();
 builder.Services.AddScoped<DashboardService>();
+builder.Services.AddScoped<NotificationService>();
 
 
 builder.Services.AddSingleton(

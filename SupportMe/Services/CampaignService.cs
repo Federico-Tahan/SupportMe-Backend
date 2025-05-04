@@ -39,7 +39,10 @@ namespace SupportMe.Services
             }
             else 
             {
-                campaignQuery = campaignQuery.Where(x => !x.GoalDate.HasValue || x.GoalDate.Value >= DateTime.UtcNow);
+                campaignQuery = campaignQuery.Where(x => (!x.GoalDate.HasValue || x.GoalDate.Value >= DateTime.UtcNow) ||
+                                                         (!x.GoalAmount.HasValue || x.GoalAmount.Value >= _context.PaymentDetail.Where(c=> c.Status == Status.OK && c.CampaignId == x.Id).Sum(x => x.Amount))
+
+                );
             }
 
             if (filter.CategoryId != null) 

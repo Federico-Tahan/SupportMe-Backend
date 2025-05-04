@@ -289,6 +289,12 @@ namespace SupportMe.Services
 
             if (!filter.Brand.IsNullOrEmpty()) 
             {
+                if (filter.Brand.Any(x => x.Equals("Mastercard", StringComparison.OrdinalIgnoreCase)))
+                {
+                    filter.Brand.Add("MASTER");
+                }
+
+
                 query = query.Where(x => filter.Brand.Contains(x.Brand));
             }
 

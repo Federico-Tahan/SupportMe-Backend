@@ -27,6 +27,7 @@ namespace SupportMe.Services
                                Amount = x.Amount,
                                CampaignName = x.Campaign.Name,
                                DonatorName = x.CardHolderName,
+                               DonatorEmail = x.CardHolderEmail,
                                Brand = x.Brand,
                                Last4 = x.Last4,
                                Date = DateHelper.GetDateInZoneTime(x.PaymentDateUTC, "ARG", -180),
@@ -54,8 +55,11 @@ namespace SupportMe.Services
                     NetReceived = result.NetReceived,
                 };
 
-                SupportMe.Models.Email email = new SupportMe.Models.Email("Registro de usuario", "~/Services/Email/Views/DonationToOwner.cshtml", result.OwnerEmail, body);
-                EmailFactory.SendEmail(email, _context);
+                SupportMe.Models.Email email1 = new SupportMe.Models.Email("Has recibido una donación", "~/Services/Email/Views/DonationToOwner.cshtml", result.OwnerEmail, body);
+                EmailFactory.SendEmail(email1, _context);
+
+                SupportMe.Models.Email email2 = new SupportMe.Models.Email("Has realizado una donacion", "~/Services/Email/Views/DonationToDonator.cshtml", result.DonatorEmail, body);
+                EmailFactory.SendEmail(email2, _context);
             }
             catch 
             {

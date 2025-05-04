@@ -28,6 +28,8 @@ namespace SupportMe.Models
         public string? CardHolderEmail { get; set; }
         public DateTime PaymentDateUTC { get; set; }
         public string? UserId { get; set; }
+        public decimal? MPCommission { get; set; }
+        public decimal? SupportmeCommission { get; set; }
         public int CampaignId { get; set; }
         [ForeignKey(nameof(CampaignId))]
         public virtual Campaign Campaign { get; set; }

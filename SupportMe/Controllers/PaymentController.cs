@@ -42,5 +42,12 @@ namespace SupportMe.Controllers
             var response = await _paymentService.GetPayments(chargeId);
             return Ok(response);
         }
+        [HttpGet("{chargeId}/detail")]
+        public async Task<IActionResult> GetDetailPayment([FromRoute] string chargeId)
+        {
+            UserMiddelware user = (UserMiddelware)HttpContext.Items["UserMiddelware"];
+            var response = await _paymentService.GetPaymentDetail(chargeId, user.User.Id);
+            return Ok(response);
+        }
     }
 }

@@ -46,7 +46,7 @@
         public object deduction_schema { get; set; }
         public int installments { get; set; }
         public Transaction_Details transaction_details { get; set; }
-        public object[] fee_details { get; set; }
+        public FeeDetail[] fee_details { get; set; }
         public Charges_Details[] charges_details { get; set; }
         public bool captured { get; set; }
         public bool binary_mode { get; set; }
@@ -72,7 +72,12 @@
         public string issuer_id { get; set; }
         public Data data { get; set; }
     }
-
+    public class FeeDetail
+    {
+        public string type { get; set; }
+        public decimal amount { get; set; }
+        public string fee_payer { get; set; }
+    }
     public class Data
     {
         public Routing_Data routing_data { get; set; }

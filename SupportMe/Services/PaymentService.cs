@@ -127,6 +127,9 @@ namespace SupportMe.Services
                 paymentDetail.Amount = payment.transaction_amount;
                 paymentDetail.TotalPaidAmount = payment.transaction_details.total_paid_amount;
                 paymentDetail.NetReceivedAmount = payment.transaction_details.net_received_amount;
+                paymentDetail.SupportmeCommission = !payment.fee_details.IsNullOrEmpty() ? payment.fee_details.Where(x => x.type == "application_fee").Select(x => x.amount).FirstOrDefault(0) : 0;
+                paymentDetail.MPCommission = !payment.fee_details.IsNullOrEmpty() ? payment.fee_details.Where(x => x.type == "mercadopago_fee").Select(x => x.amount).FirstOrDefault(0) : 0;
+
             }
             else if (payment.status == MP_STATUS.rejected.ToString())
             {
@@ -343,6 +346,23 @@ namespace SupportMe.Services
         {
             var response = await _context.PaymentDetail.Include(x => x.Campaign).Where(x => x.ChargeId == chargeId)
                 .Select(x => new SimpleDonation { Amount = x.Amount, CampaignName = x.Campaign.Name, DonatorName = x.CardHolderName }).FirstOrDefaultAsync();
+            return response;
+        }
+        public async Task<PaymentDetailDTO> GetPaymentDetail(string chargeId, string userId)
+        {
+            var response = await _context.PaymentDetail.Include(x => x.Campaign).Where(x => x.ChargeId == chargeId && x.Campaign.UserId == userId)
+                .Select(x => new PaymentDetailDTO 
+                {
+                    Amount = x.Amount, 
+                    CampaignName = x.Campaign.Name, 
+                    DonatorName = x.CardHolderName,
+                    Brand = x.Brand,
+                    Last4 = x.Last4,
+                    Date = DateHelper.GetDateInZoneTime(x.PaymentDateUTC, "ARG", -180),
+                    Status = x.Status.ToString(),
+                    Comment = _context.PaymentComments.Where(c => c.PaymentId == x.Id).Select(c => c.Comment).FirstOrDefault()
+                })
+                .FirstOrDefaultAsync();
             return response;
         }
     }

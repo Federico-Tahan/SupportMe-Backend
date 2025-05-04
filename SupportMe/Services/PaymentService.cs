@@ -366,7 +366,10 @@ namespace SupportMe.Services
                     Last4 = x.Last4,
                     Date = DateHelper.GetDateInZoneTime(x.PaymentDateUTC, "ARG", -180),
                     Status = x.Status.ToString(),
-                    Comment = _context.PaymentComments.Where(c => c.PaymentId == x.Id).Select(c => c.Comment).FirstOrDefault()
+                    Comment = _context.PaymentComments.Where(c => c.PaymentId == x.Id).Select(c => c.Comment).FirstOrDefault(),
+                    CommissionMP = x.MPCommission,
+                    CommissionSupportMe = x.SupportmeCommission,
+                    NetReceived = x.NetReceivedAmount
                 })
                 .FirstOrDefaultAsync();
             return response;

@@ -10,5 +10,9 @@
         public string Brand { get; set; }
         public DateTime Date { get; set; }
         public string? Comment { get; set; }
+        public decimal? CommissionSupportMe { get; set; }
+        public decimal? CommissionMP { get; set; }
+        public decimal NetReceived { get; set; }
+
     }
 }

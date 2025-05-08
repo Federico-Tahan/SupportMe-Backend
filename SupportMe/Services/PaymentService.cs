@@ -42,6 +42,7 @@ namespace SupportMe.Services
                     if (response.Success)
                     {
                         await _notificationService.SendDonationToOwner(response.Response.ChargeId);
+                        await _notificationService.SendGoalDonationNotification(campaign.Id);
 
                     }
                 }

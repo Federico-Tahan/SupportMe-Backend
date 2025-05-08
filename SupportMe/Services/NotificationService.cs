@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Win32;
 using SupportMe.Data;
+using SupportMe.DTOs.CampaignDTOs;
 using SupportMe.DTOs.PaymentDTOs;
 using SupportMe.Helpers;
 using SupportMe.Models;
@@ -66,6 +67,100 @@ namespace SupportMe.Services
                 return;
             }
             
+        }
+
+        public async Task SendGoalDonationNotification(int campaignId)
+        {
+            try
+            {
+                var campaign = await _context.Campaigns
+                    .Include(c => c.User)
+                    .FirstOrDefaultAsync(x => x.Id == campaignId);
+
+                if (campaign == null || !campaign.GoalAmount.HasValue)
+                {
+                    return;
+                }
+
+                var goalAmount = campaign.GoalAmount.Value;
+
+                // Obtiene total recaudado
+                var amounts = await _context.PaymentDetail
+                    .Where(x => x.CampaignId == campaignId && x.Status == Status.OK)
+                    .GroupBy(x => x.CampaignId)
+                    .Select(x => new
+                    {
+                        Donations = x.Count(),
+                        Income = x.Sum(x => x.Amount),
+                    })
+                    .FirstOrDefaultAsync();
+
+                if (amounts == null)
+                {
+                    return; // No hay donaciones
+                }
+
+                decimal percentageReached = (amounts.Income / goalAmount) * 100;
+
+                // Busca última notificación enviada para la campaña
+                var lastNotification = await _context.CampaignNotification
+                    .Where(n => n.CampaignId == campaignId)
+                    .OrderByDescending(n => n.DateUtc)
+                    .FirstOrDefaultAsync();
+
+                string nextNotification = null;
+
+                if (percentageReached >= 100 && (lastNotification == null || lastNotification.NotificationType != "100"))
+                {
+                    nextNotification = "100";
+                }
+                else if (percentageReached >= 75 && (lastNotification == null || lastNotification.NotificationType != "75"))
+                {
+                    nextNotification = "75";
+                }
+                else if (percentageReached >= 50 && (lastNotification == null || lastNotification.NotificationType != "50"))
+                {
+                    nextNotification = "50";
+                }
+
+                if (nextNotification != null)
+                {
+                    // Guarda registro en CampaignNotification
+                    var newNotification = new CampaignNotification
+                    {
+                        CampaignId = campaignId,
+                        DateUtc = DateTime.UtcNow,
+                        NotificationType = nextNotification
+                    };
+                    _context.CampaignNotification.Add(newNotification);
+                    await _context.SaveChangesAsync();
+
+                    // Prepara y envía email
+                    var emailDto = new EmailNotificationDTO
+                    {
+                        GoalAmount = goalAmount,
+                        Income = amounts.Income,
+                        CampaignName = campaign.Name,
+                        OwnerName = $"{campaign.User.Name} {campaign.User.LastName}",
+                        Donations = amounts.Donations
+                    };
+
+                    var email = new SupportMe.Models.Email(
+                        "¡Has alcanzado una nueva meta!",
+                        "~/Services/Email/Views/GoalDonations.cshtml",
+                        campaign.User.Email,
+                        emailDto
+                    );
+
+                    EmailFactory.SendEmail(email, _context);
+                }
+            }
+            catch (Exception ex)
+            {
+                // Aquí puedes loguear el error si lo deseas
+                return;
+            }
+
         }
     }
 }

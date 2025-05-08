@@ -1,0 +1,232 @@
+﻿@model SupportMe.DTOs.CampaignDTOs.EmailNotificationDTO
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Actualización de Campaña: @Model.CampaignName</title>
+    <style>
+        /* Estilos base para el email */
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            background-color: #6c5ce7;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .logo {
+            max-width: 150px;
+            margin-bottom: 10px;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .campaign-info {
+            background-color: #f8f9fa;
+            border-radius: 6px;
+            padding: 20px;
+            margin-bottom: 25px;
+            border-left: 4px solid #6c5ce7;
+        }
+
+        .progress-container {
+            margin: 25px 0;
+        }
+
+        .progress-bar {
+            background-color: #e9ecef;
+            height: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background-color: #6c5ce7;
+            height: 100%;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            transition: width 1s ease-in-out;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            margin: 25px 0;
+            text-align: center;
+        }
+
+        .stat {
+            flex: 1;
+            padding: 15px;
+        }
+
+        .stat-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #6c5ce7;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .cta-button {
+            display: block;
+            background-color: #6c5ce7;
+            color: white;
+            text-decoration: none;
+            padding: 15px 25px;
+            border-radius: 50px;
+            font-weight: bold;
+            text-align: center;
+            margin: 30px auto;
+            max-width: 200px;
+            transition: background-color 0.3s;
+        }
+
+        .cta-button:hover {
+            background-color: #5a4bd1;
+        }
+
+        .campaign-banner {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .campaign-icon {
+            width: 50px;
+            height: 50px;
+            background-color: #f8f9fa;
+            border-radius: 50%;
+            overflow: hidden;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .campaign-icon span {
+            font-size: 24px;
+        }
+
+        .campaign-title {
+            flex-grow: 1;
+        }
+
+        .campaign-title h3 {
+            margin: 0 0 5px 0;
+            color: #333;
+        }
+
+        .campaign-title p {
+            margin: 0;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .footer {
+            background-color: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            font-size: 12px;
+            color: #666;
+        }
+
+        /* Estilos responsivos */
+        @@media only screen and (max-width: 480px) {
+            .content {
+                padding: 15px;
+            }
+
+            .stats {
+                flex-direction: column;
+            }
+
+            .stat {
+                margin-bottom: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>¡Buenas noticias sobre tu campaña!</h1>
+        </div>
+
+        <div class="content">
+            <p>Hola @Model.OwnerName,</p>
+
+            <p>¡Tenemos excelentes noticias sobre tu campaña de recaudación de fondos!</p>
+
+            <div class="campaign-info">
+                <div class="campaign-banner">
+                    <div class="campaign-title">
+                        <h3>@Model.CampaignName</h3>
+                    </div>
+                </div>
+            </div>
+
+            @{
+                decimal percentage = (Model.Income / Model.GoalAmount) * 100;
+                string formattedPercentage = Math.Round(percentage).ToString();
+            }
+
+            <h2>Tu campaña ha alcanzado el @formattedPercentage% de su meta</h2>
+
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: @formattedPercentage%;">@formattedPercentage%</div>
+                </div>
+            </div>
+
+            <div class="stats">
+                <div class="stat">
+                    <div class="stat-number">$@string.Format("{0:N2}", Model.Income) ARS</div>
+                    <div class="stat-label">Recaudado</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number">$@string.Format("{0:N2}", Model.GoalAmount) ARS</div>
+                    <div class="stat-label">Meta</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number">@Model.Donations</div>
+                    <div class="stat-label">@(Model.Donations == 1 ? "Donación" : "Donaciones")</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>© @DateTime.Now.Year Plataforma de Donaciones. Todos los derechos reservados.</p>
+        </div>
+    </div>
+</body>
+</html>

@@ -79,7 +79,7 @@ namespace SupportMe.Services
                
                 var body = new ForgotPassword
                 {
-                   Url = $"{_configuration.GetValue<string>("SUPPORTME_PAGE")}/forgot?token={token}",
+                   Url = $"{_configuration.GetValue<string>("SUPPORTME_PAGE")}forgot?token={token}",
                    UserName = userName,
 
                 };

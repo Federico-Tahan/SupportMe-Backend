@@ -97,7 +97,7 @@ namespace SupportMe.Services
         {
 
             var user = await _context.Users.FirstOrDefaultAsync(x => x.Email == email);
-            //if (user == null) return;
+            if (user == null) return;
 
             var token = new ForgotPasswordToken(email, TimeSpan.FromHours(1));
             string encrypted = token.Encrypt(_configuration);

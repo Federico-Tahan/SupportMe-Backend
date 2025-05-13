@@ -2,6 +2,7 @@
 using AutoMapper;
 using Core.BusinessLogic;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Win32;
 using SixLabors.ImageSharp;
 using SupportMe.Data;
@@ -92,6 +93,24 @@ namespace SupportMe.Services
             var user = await GetUserById(userId);
             return user;
         }
+
+        public async Task<bool> ChangePassword(string token, string password)
+        {
+
+            var decrypted = ForgotPasswordToken.Decrypt(System.Web.HttpUtility.UrlDecode(token), _configuration);
+            if (decrypted is null || decrypted.HasExpired()) 
+            {
+                return false;
+            }
+
+            var user = await _context.Users.Where(x => x.Email == decrypted.Email).FirstOrDefaultAsync();
+
+            await _firebaseAuthService.ChangePassword(user, password);
+
+            return true;
+        }
+
+
 
         public async Task ForgotPassword(string email)
         {

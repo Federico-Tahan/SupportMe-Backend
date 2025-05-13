@@ -60,5 +60,13 @@ namespace SupportMe.Controllers
             await _userService.ForgotPassword(email);
             return Ok();
         }
+
+        [HttpPost("password/change")]
+        [AllowAnonymous]
+        public async Task<IActionResult> ChangePassword([FromQuery] string token, [FromQuery] string newPassword)
+        {
+            await _userService.ChangePassword(token, newPassword);
+            return Ok();
+        }
     }
 }

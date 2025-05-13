@@ -57,5 +57,28 @@ namespace SupportMe.Services.Auth
             }
             return decodedToken;
         }
+
+        public async Task<UserRecord> ChangePassword(User user, string newPassword)
+        {
+            try
+            {
+                var fireBaseUser = await _firebaseHandler.Auth.TenantManager
+                                    .AuthForTenant(_configuration.GetValue<string>("TenantId"))
+                                        .UpdateUserAsync(new UserRecordArgs
+                                        {
+                                            Email = user.Email,
+                                            Password = newPassword,
+                                            DisplayName = $"{user.Name} {user.LastName}",
+                                            EmailVerified = true,
+                                            Uid = user.AuthExternalId
+                                        });
+                return fireBaseUser;
+            }
+            catch
+            {
+                return null;
+
+            }
+        }
     }
 }

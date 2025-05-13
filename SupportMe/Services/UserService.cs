@@ -1,7 +1,9 @@
 ﻿using Amazon.Auth.AccessControlPolicy;
 using AutoMapper;
+using Core.BusinessLogic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Win32;
+using SixLabors.ImageSharp;
 using SupportMe.Data;
 using SupportMe.DTOs.UserDTOs;
 using SupportMe.Models;
@@ -18,11 +20,15 @@ namespace SupportMe.Services
         private readonly DataContext _context;
         private readonly FirebaseAuthService _firebaseAuthService;
         private readonly IMapper _mapper;
-        public UserService(DataContext context, FirebaseAuthService firebaseAuthService, IMapper mapper)
+        private readonly IConfiguration _configuration;
+        private readonly NotificationService _notificationService;
+        public UserService(DataContext context, FirebaseAuthService firebaseAuthService, IMapper mapper, IConfiguration configuration, NotificationService notificationService)
         {
             _context = context;
             _firebaseAuthService = firebaseAuthService;
             _mapper = mapper;
+            _configuration = configuration;
+            _notificationService = notificationService;
         }
 
 
@@ -87,7 +93,16 @@ namespace SupportMe.Services
             return user;
         }
 
+        public async Task ForgotPassword(string email)
+        {
 
+            var user = await _context.Users.FirstOrDefaultAsync(x => x.Email == email);
+            //if (user == null) return;
+
+            var token = new ForgotPasswordToken(email, TimeSpan.FromHours(1));
+            string encrypted = token.Encrypt(_configuration);
+            _notificationService.ForgotPassword($"{user?.Name} {user?.LastName}", email, encrypted);
+        }
         private string DecodeToken(string token)
         {
             var handler = new JwtSecurityTokenHandler();

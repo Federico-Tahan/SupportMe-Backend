@@ -2,6 +2,7 @@
 using Microsoft.Win32;
 using SupportMe.Data;
 using SupportMe.DTOs.CampaignDTOs;
+using SupportMe.DTOs.ForgotPassword;
 using SupportMe.DTOs.PaymentDTOs;
 using SupportMe.Helpers;
 using SupportMe.Models;
@@ -12,9 +13,11 @@ namespace SupportMe.Services
     public class NotificationService
     {
         public readonly DataContext _context;
-        public NotificationService(DataContext context)
+        private readonly IConfiguration _configuration;
+        public NotificationService(DataContext context, IConfiguration configuration)
         {
             _context = context;
+            _configuration = configuration;
         }
 
 
@@ -67,6 +70,29 @@ namespace SupportMe.Services
                 return;
             }
             
+        }
+
+        public async void ForgotPassword(string userName, string email, string token)
+        {
+            try
+            {
+               
+                var body = new ForgotPassword
+                {
+                   Url = $"{_configuration.GetValue<string>("SUPPORTME_PAGE")}/forgot?token={token}",
+                   UserName = userName,
+
+                };
+
+                SupportMe.Models.Email emailb = new SupportMe.Models.Email("Recupera tu contraseña", "~/Services/Email/Views/ForgotPassword.cshtml", email, body);
+                EmailFactory.SendEmail(emailb, _context);
+
+            }
+            catch
+            {
+                return;
+            }
+
         }
 
         public async Task SendGoalDonationNotification(int campaignId)

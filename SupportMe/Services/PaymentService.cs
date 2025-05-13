@@ -301,6 +301,11 @@ namespace SupportMe.Services
                 if (filter.Brand.Any(x => x.Equals("Mastercard", StringComparison.OrdinalIgnoreCase)))
                 {
                     filter.Brand.Add("MASTER");
+                    filter.Brand.Add("DEBMASTER");
+                } else if (filter.Brand.Any(x => x.Equals("Mastercard", StringComparison.OrdinalIgnoreCase))) 
+                {
+                    filter.Brand.Add("DEBVISA");
+                    filter.Brand.Add("VISA");
                 }
 
 

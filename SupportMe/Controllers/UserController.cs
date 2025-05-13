@@ -52,5 +52,13 @@ namespace SupportMe.Controllers
             var response = await _authService.IsAvailableEmail(email);
             return Ok(response);
         }
+
+        [HttpGet("password/forgot")]
+        [AllowAnonymous]
+        public async Task<IActionResult> ForgotPassword([FromQuery] string email)
+        {
+            await _userService.ForgotPassword(email);
+            return Ok();
+        }
     }
 }

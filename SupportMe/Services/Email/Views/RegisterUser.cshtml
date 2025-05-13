@@ -1,369 +1,218 @@
-﻿@model SupportMe.DTOs.PaymentDTOs.PaymentDetailDTO
+﻿@model SupportMe.Services.Email.Views.RegisterModel
+
 @{
     Layout = null;
 }
 
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-    <meta charset="utf-8">
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Detalle de Donación</title>
-    <style type="text/css">
-        /* Estilos de respaldo que algunos clientes pueden usar */
-        body, html {
+    <title>Registro Exitoso</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             padding: 0;
-            font-family: 'Inter', Arial, sans-serif;
-            background-color: #F9FAFB;
-            color: #111827;
+            background-color: #f5f5f5;
+            color: #333;
         }
-        
-        table {
-            border-spacing: 0;
-            border-collapse: collapse;
-            mso-table-lspace: 0pt;
-            mso-table-rspace: 0pt;
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
         }
-        
-        td {
-            padding: 0;
+
+        .email-card {
+            background-color: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            margin-top: 20px;
         }
-        
-        img {
-            border: 0;
-            line-height: 100%;
-            outline: none;
+
+        .logo {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+            .logo img {
+                max-width: 150px;
+                height: auto;
+            }
+
+        .title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #333;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .subtitle {
+            font-size: 16px;
+            color: #666;
+            text-align: center;
+            margin-bottom: 30px;
+            line-height: 1.5;
+        }
+
+        .btn-container {
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .btn-continue {
+            display: inline-block;
+            padding: 12px 30px;
+            background-color: #4361ee;
+            color: white !important;
             text-decoration: none;
-            display: block;
+            font-weight: 600;
+            border-radius: 8px;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
         }
-        
-        .hide-in-desktop {
-            display: none;
-            max-height: 0;
-            overflow: hidden;
+
+            .btn-continue:hover {
+                background-color: #3a56d4;
+            }
+
+        .info-block {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 30px;
         }
-        
-        @@media (max-width: 600px) {
+
+        .info-title {
+            font-weight: 600;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            color: #999;
+            font-size: 14px;
+        }
+
+        .social-links {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .social-icon {
+            display: inline-block;
+            margin: 0 10px;
+            color: #4361ee;
+            font-size: 22px;
+        }
+
+        @@keyframes wave {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            10% {
+                transform: rotate(14deg);
+            }
+
+            20% {
+                transform: rotate(-8deg);
+            }
+
+            30% {
+                transform: rotate(14deg);
+            }
+
+            40% {
+                transform: rotate(-4deg);
+            }
+
+            50% {
+                transform: rotate(10deg);
+            }
+
+            60% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(0deg);
+            }
+        }
+
+        .wave-emoji {
+            display: inline-block;
+            transform-origin: 70% 70%;
+            animation: wave 2.5s infinite;
+        }
+
+        @@media screen and (max-width: 480px) {
             .container {
-                width: 100% !important;
+                padding: 10px;
             }
-            
-            .card {
-                border-radius: 0 !important;
-                border-left: 0 !important;
-                border-right: 0 !important;
-            }
-            
-            .hide-in-desktop {
-                display: block !important;
-                max-height: none !important;
-            }
-            
-            .hide-in-mobile {
-                display: none !important;
-            }
-            
-            .mobile-padding {
-                padding: 15px !important;
-            }
-            
-            .stacked-column {
-                display: block !important;
-                width: 100% !important;
-            }
-            
-            .mobile-center {
-                text-align: center !important;
-            }
-            
-            .mobile-full-width {
-                width: 100% !important;
-            }
-            
-            .mobile-padding-bottom {
-                padding-bottom: 15px !important;
+
+            .email-card {
+                padding: 20px;
             }
         }
     </style>
 </head>
-<body style="margin: 0; padding: 0; background-color: #F9FAFB; color: #111827; font-family: 'Inter', Arial, sans-serif; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%;">
+<body>
+    <div class="container">
+        <div class="email-card">
+            <div class="logo">
+                <img src="https://supportme2.s3.sa-east-1.amazonaws.com/Group+408.png" alt="Logo">
+            </div>
 
-<!-- Contenedor principal -->
-<div style="width: 100%; table-layout: fixed;">
-    <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
-        <!-- Tarjeta -->
-        <table class="card" width="100%" cellpadding="0" cellspacing="0" style="background-color: #FFFFFF; border-radius: 12px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); border: 1px solid #E5E7EB; overflow: hidden;">
-            <!-- Cabecera -->
-            <tr>
-                <td style="background-color: #6366F1; padding: 24px 30px; color: #FFFFFF; position: relative;">
-                    <h2 style="font-size: 20px; font-weight: 600; margin: 0; letter-spacing: 0.2px;">Detalle de Donación</h2>
-                    <!-- Triángulo decorativo para clientes que lo soportan -->
-                    <div style="position: relative;">
-                        <div style="position: absolute; top: 24px; left: 30px; width: 0; height: 0; border-left: 10px solid transparent; border-right: 10px solid transparent; border-top: 10px solid #6366F1;"></div>
-                    </div>
-                </td>
-            </tr>
-            
-            <!-- Cuerpo de la tarjeta -->
-            <tr>
-                <td class="mobile-padding" style="padding: 30px;">
-                    <!-- Sección de monto y estado -->
-                    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 25px; border-bottom: 1px solid #E5E7EB; padding-bottom: 20px;">
-                        <tr>
-                            <!-- Monto -->
-                            <td class="mobile-padding-bottom" style="font-size: 32px; font-weight: 700; color: #111827;">
-                                $ @Model.Amount.ToString("N2")
-                            </td>
-                            
-                            <!-- Estado -->
-                            <td align="right">
-                                <table cellpadding="0" cellspacing="0" style="margin-left: auto;">
-                                    <tr>
-                                        @if (Model.Status?.ToLower() == "ok" || Model.Status?.ToLower() == "successful" || Model.Status?.ToLower() == "completed")
-                                        {
-                                            <td style="background-color: rgba(16, 185, 129, 0.1); border-radius: 30px; padding: 8px 16px; color: #10B981; font-size: 14px; font-weight: 600;">
-                                                <table cellpadding="0" cellspacing="0">
-                                                    <tr>
-                                                        <td>
-                                                            <!-- Icono de check -->
-                                                            <img src="https://i.imgur.com/JsES6Nm.png" width="16" height="16" alt="Éxito" style="display: inline-block; vertical-align: middle;">
-                                                        </td>
-                                                        <td style="padding-left: 6px;">
-                                                            OK
-                                                        </td>
-                                                    </tr>
-                                                </table>
-                                            </td>
-                                        }
-                                        else
-                                        {
-                                            <td style="background-color: rgba(239, 68, 68, 0.1); border-radius: 30px; padding: 8px 16px; color: #EF4444; font-size: 14px; font-weight: 600;">
-                                                <table cellpadding="0" cellspacing="0">
-                                                    <tr>
-                                                        <td>
-                                                            <!-- Icono de error -->
-                                                            <img src="https://i.imgur.com/UyZcZAk.png" width="16" height="16" alt="Error" style="display: inline-block; vertical-align: middle;">
-                                                        </td>
-                                                        <td style="padding-left: 6px;">
-                                                            Error
-                                                        </td>
-                                                    </tr>
-                                                </table>
-                                            </td>
-                                        }
-                                    </tr>
-                                </table>
-                            </td>
-                        </tr>
-                    </table>
-                    
-                    <!-- Grid de información -->
-                    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 25px;">
-                        <tr>
-                            <!-- Columna 1 -->
-                            <td class="stacked-column" width="48%" valign="top" style="padding-right: 4%;">
-                                <!-- Método de pago -->
-                                <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 20px;">
-                                    <tr>
-                                        <td style="font-size: 14px; color: #6B7280; margin-bottom: 8px; font-weight: 500; padding-bottom: 8px;">
-                                            Método de pago
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td style="font-weight: 600; color: #111827; padding-bottom: 10px;">
-                                            Tarjeta de crédito
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td style="background-color: #F3F4F6; padding: 14px; border-radius: 12px;">
-                                            <table cellpadding="0" cellspacing="0">
-                                                <tr>
-                                                    <td>
-                                                        @{
-                                                            var brandImage = "";
-                                                            var brandLower = Model.Brand?.ToLower() ?? "";
-                                                            
-                                                            if (brandLower.Contains("visa")) {
-                                                                brandImage = "https://img.icons8.com/?size=100&id=13608&format=png&color=000000";
-                                                            } else if (brandLower.Contains("master")) {
-                                                                brandImage = "https://img.icons8.com/?size=100&id=13610&format=png&color=000000";
-                                                            }
-                                                        }
-                                                        
-                                                        @if (!string.IsNullOrEmpty(brandImage))
-                                                        {
-                                                            <img src="@brandImage" width="40" height="25" alt="@Model.Brand" style="border-radius: 4px;">
-                                                        }
-                                                        else
-                                                        {
-                                                            <div style="width: 40px; height: 25px; border-radius: 6px; background-color: #1A237E; position: relative;">
-                                                                <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 14px; height: 14px; background-color: #F44336; border-radius: 50%;"></div>
-                                                            </div>
-                                                        }
-                                                    </td>
-                                                    <td style="padding-left: 12px;">
-                                                        •••• @Model.Last4
-                                                    </td>
-                                                </tr>
-                                            </table>
-                                        </td>
-                                    </tr>
-                                </table>
-                                
-                                <!-- Fecha -->
-                                <table width="100%" cellpadding="0" cellspacing="0">
-                                    <tr>
-                                        <td style="font-size: 14px; color: #6B7280; margin-bottom: 8px; font-weight: 500; padding-bottom: 8px;">
-                                            Fecha de transacción
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <table cellpadding="0" cellspacing="0">
-                                                <tr>
-                                                    <td>
-                                                        <img src="https://i.imgur.com/7GxrBtT.png" width="16" height="16" alt="Fecha" style="display: inline-block; vertical-align: middle;">
-                                                    </td>
-                                                    <td style="padding-left: 8px; font-weight: 600; color: #111827;">
-                                                        @Model.Date.ToString("dd MMM, yyyy, h:mm tt")
-                                                    </td>
-                                                </tr>
-                                            </table>
-                                        </td>
-                                    </tr>
-                                </table>
-                            </td>
-                            
-                            <!-- Columna 2 -->
-                            <td class="stacked-column" width="48%" valign="top">
-                                <!-- Campaña -->
-                                <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 20px;">
-                                    <tr>
-                                        <td style="font-size: 14px; color: #6B7280; margin-bottom: 8px; font-weight: 500; padding-bottom: 8px;">
-                                            Campaña
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td style="font-weight: 600; color: #111827;">
-                                            <span style="font-size: 14px; font-weight: 500;">@Model.CampaignName</span>
-                                        </td>
-                                    </tr>
-                                </table>
-                                
-                                <!-- Cliente -->
-                                <table width="100%" cellpadding="0" cellspacing="0">
-                                    <tr>
-                                        <td style="font-size: 14px; color: #6B7280; margin-bottom: 8px; font-weight: 500; padding-bottom: 8px;">
-                                            Cliente
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td style="font-weight: 600; color: #111827;">
-                                            @Model.DonatorName
-                                        </td>
-                                    </tr>
-                                </table>
-                            </td>
-                        </tr>
-                    </table>
-                    
-                    <!-- Sección de comisiones (solo si hay valores) -->
-                    @if ((Model.CommissionSupportMe.HasValue && Model.CommissionSupportMe.Value != 0) || 
-                         (Model.CommissionMP.HasValue && Model.CommissionMP.Value != 0))
-                    {
-                        <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 25px; border-bottom: 1px solid #E5E7EB; padding-bottom: 20px;">
-                            <tr>
-                                <td style="font-size: 14px; color: #6B7280; margin-bottom: 8px; font-weight: 500; padding-bottom: 8px;">
-                                    Detalle de comisiones
-                                </td>
-                            </tr>
-                            <tr>
-                                <td style="background-color: #F3F4F6; border-radius: 12px; padding: 5px;">
-                                    <table width="100%" cellpadding="0" cellspacing="0">
-                                        @if (Model.CommissionSupportMe.HasValue && Model.CommissionSupportMe.Value != 0)
-                                        {
-                                            <tr>
-                                                <td style="padding: 12px 15px; @(Model.CommissionMP.HasValue && Model.CommissionMP.Value != 0 ? "border-bottom: 1px solid rgba(229, 231, 235, 0.5);" : "")">
-                                                    <table width="100%" cellpadding="0" cellspacing="0">
-                                                        <tr>
-                                                            <td style="font-size: 14px; color: #111827;">
-                                                                Comisión de plataforma
-                                                            </td>
-                                                            <td align="right" style="font-weight: 600; color: #111827;">
-                                                                $ @Model.CommissionSupportMe.Value.ToString("N2")
-                                                            </td>
-                                                        </tr>
-                                                    </table>
-                                                </td>
-                                            </tr>
-                                        }
-                                        
-                                        @if (Model.CommissionMP.HasValue && Model.CommissionMP.Value != 0)
-                                        {
-                                            <tr>
-                                                <td style="padding: 12px 15px;">
-                                                    <table width="100%" cellpadding="0" cellspacing="0">
-                                                        <tr>
-                                                            <td style="font-size: 14px; color: #111827;">
-                                                                Comisión de procesamiento
-                                                            </td>
-                                                            <td align="right" style="font-weight: 600; color: #111827;">
-                                                                $ @Model.CommissionMP.Value.ToString("N2")
-                                                            </td>
-                                                        </tr>
-                                                    </table>
-                                                </td>
-                                            </tr>
-                                        }
-                                    </table>
-                                </td>
-                            </tr>
-                        </table>
-                    }
-                    
-                    <!-- Total recibido -->
-                    <table width="100%" cellpadding="0" cellspacing="0" style="margin-top: 25px;">
-                        <tr>
-                            <td style="font-size: 14px; color: #6B7280; font-weight: 500;">
-                                Total recibido
-                            </td>
-                            <td align="right" style="font-size: 22px; font-weight: 700; color: #10B981;">
-                                $ @Model.NetReceived.ToString("N2")
-                            </td>
-                        </tr>
-                    </table>
-                    
-                    <!-- Palabras de apoyo (solo si existe) -->
-                    @if (!string.IsNullOrEmpty(Model.Comment))
-                    {
-                        <table width="100%" cellpadding="0" cellspacing="0" style="margin-top: 25px;">
-                            <tr>
-                                <td style="font-size: 14px; color: #6B7280; margin-bottom: 8px; font-weight: 500; padding-bottom: 8px;">
-                                    Palabras de apoyo
-                                </td>
-                            </tr>
-                            <tr>
-                                <td style="background-color: #F3F4F6; border-radius: 12px; padding: 20px; font-style: italic; border-left: 3px solid #6366F1;">
-                                    @Model.Comment
-                                </td>
-                            </tr>
-                        </table>
-                    }
-                </td>
-            </tr>
-        </table>
-        
-        <!-- Pie de página -->
-        <table width="100%" cellpadding="0" cellspacing="0" style="margin-top: 20px;">
-            <tr>
-                <td align="center" style="color: #6B7280; font-size: 12px; padding: 10px;">
-                    © @DateTime.Now.Year Supportme. Todos los derechos reservados.
-                </td>
-            </tr>
-        </table>
+            <h1 class="title">&#161;Registro Exitoso! <span class="wave-emoji">👋</span></h1>
+
+            <p class="subtitle">
+                Hola <strong>@Model.User.Name @Model.User.LastName</strong>, gracias por unirte a SupportMe.
+                Tu cuenta ha sido creada correctamente y ya puedes comenzar a disfrutar de todos nuestros servicios.
+            </p>
+
+            <div class="btn-container">
+                <a href="https://supportme.site" class="btn-continue">Ir a la aplicaci&#243;n</a>
+            </div>
+
+            <div class="info-block">
+                <p class="info-title">Detalles de tu cuenta:</p>
+                <p><strong>Email:</strong> @Model.User.Email</p>
+                <p><strong>Fecha de registro:</strong> @DateTime.UtcNow.ToString("dd/MM/yyyy")</p>
+                <p>
+                    Si tienes alguna pregunta o necesitas ayuda, no dudes en
+                    <a href="mailto:infosuppme@gmail.com" style="color: #4361ee; text-decoration: none;">contactarnos</a>.
+                </p>
+            </div>
+
+            <div class="social-links">
+                <a href="#" class="social-icon"><i class="fab fa-facebook"></i></a>
+                <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
+                <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
+                <a href="#" class="social-icon"><i class="fab fa-linkedin"></i></a>
+            </div>
+
+            <div class="footer">
+                <p>&#169; @DateTime.Now.Year SupportMe. Todos los derechos reservados.</p>
+                <p>
+                    <a href="#" style="color: #666; text-decoration: none; margin: 0 10px;">Pol&#237;tica de privacidad</a> |
+                    <a href="#" style="color: #666; text-decoration: none; margin: 0 10px;">T&#233;rminos de servicio</a>
+                </p>
+                <p style="margin-top: 15px;">
+                    Si no deseas recibir estos correos, puedes <a href="#" style="color: #666;">darte de baja</a>.
+                </p>
+            </div>
+        </div>
     </div>
-</div>
-
 </body>
-</html>

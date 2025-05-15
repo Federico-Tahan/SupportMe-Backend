@@ -49,5 +49,13 @@ namespace SupportMe.Controllers
             var response = await _paymentService.GetPaymentDetail(chargeId, user.User.Id);
             return Ok(response);
         }
+
+        [HttpGet("donations")]
+        public async Task<IActionResult> GetDonations([FromQuery] int skip = 0, [FromQuery] int take = 5)
+        {
+            UserMiddelware user = (UserMiddelware)HttpContext.Items["UserMiddelware"];
+            var response = await _paymentService.GetDonationsByUser(user.User.Id, skip, take);
+            return Ok(response);
+        }
     }
 }

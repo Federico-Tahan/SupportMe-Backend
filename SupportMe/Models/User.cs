@@ -14,5 +14,6 @@ namespace SupportMe.Models
         public string? AuthExternalId { get; set; }
         public string? ProfilePic { get; set; }
         public DateTime DateOfBirth { get; set; }
+        public DateTime CreatedDateUTC { get; set; }
     }
 }

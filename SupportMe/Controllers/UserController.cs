@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SupportMe.DTOs.UserDTOs;
+using SupportMe.MiddleWares;
 using SupportMe.Services;
 using SupportMe.Services.Auth;
 
@@ -67,6 +68,14 @@ namespace SupportMe.Controllers
         {
             await _userService.ChangePassword(token, newPassword);
             return Ok();
+        }
+
+        [HttpGet("profile")]
+        public async Task<IActionResult> GetUserProfile()
+        {
+            UserMiddelware user = (UserMiddelware)HttpContext.Items["UserMiddelware"];
+            var response = await _userService.GetProfile(user.User.Id);
+            return Ok(response);
         }
     }
 }

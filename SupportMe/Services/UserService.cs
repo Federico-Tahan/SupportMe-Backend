@@ -110,7 +110,24 @@ namespace SupportMe.Services
             return true;
         }
 
+        public async Task<SimpleUserInfo> GetProfile(string userId)
+        {
+            var user = await _context.Users.Where(x => x.Id == userId)
+                .Select(x => new SimpleUserInfo 
+                {
+                    DateOfBirth = x.DateOfBirth,
+                    Email = x.Email,
+                    LastName = x.LastName,
+                    Name = x.Name,
+                    ProfilePic = x.ProfilePic,
+                    DonationsCount = _context.PaymentDetail.Where(c => c.UserId == x.Id && c.Status == Status.OK).Count(),
+                    TotalDonated = _context.PaymentDetail.Where(c => c.UserId == x.Id && c.Status == Status.OK).Sum(x => x.Amount)
 
+                })
+                .FirstOrDefaultAsync();
+
+            return user;
+        }
 
         public async Task ForgotPassword(string email)
         {

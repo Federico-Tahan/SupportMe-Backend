@@ -368,6 +368,24 @@ namespace SupportMe.Services
                 .Select(x => new SimpleDonation { Amount = x.Amount, CampaignName = x.Campaign.Name, DonatorName = x.CardHolderName }).FirstOrDefaultAsync();
             return response;
         }
+
+        public async Task<List<SimpleDonation>> GetDonationsByUser(string userId, int skip = 0, int take = 5)
+        {
+            var response = await _context.PaymentDetail.Include(x => x.Campaign).Where(x => x.UserId == userId)
+                .Select(x => new SimpleDonation 
+                { 
+                    Amount = x.Amount, 
+                    CampaignName = x.Campaign.Name, 
+                    DonatorName = x.CardHolderName,
+                    Date = DateHelper.GetDateInZoneTime(x.PaymentDateUTC, "ARG", -180),
+                    Comment = _context.PaymentComments.Where(c => c.PaymentId == x.Id).Select(c => c.Comment).FirstOrDefault()
+                })
+                .Skip(skip)
+                .Take(take)
+                .ToListAsync();
+
+            return response;
+        }
         public async Task<PaymentDetailDTO> GetPaymentDetail(string chargeId, string userId)
         {
             var response = await _context.PaymentDetail.Include(x => x.Campaign).Where(x => x.ChargeId == chargeId && x.Campaign.UserId == userId)

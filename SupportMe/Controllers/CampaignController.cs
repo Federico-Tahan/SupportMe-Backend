@@ -27,6 +27,16 @@ namespace SupportMe.Controllers
             return Ok(campaigns);
         }
 
+        [HttpGet("most/raised")]
+        [Authorize]
+        public async Task<IActionResult> GetMostRaisedCampaign()
+        {
+            UserMiddelware user = (UserMiddelware)HttpContext.Items["UserMiddelware"];
+            var campaigns = await _campaignService.GetMostRaisedCampaigns(user?.User?.Id);
+            return Ok(campaigns);
+        }
+
+
         [HttpGet("simple")]
         [Authorize]
         public async Task<IActionResult> GetSimpleCampaigns()

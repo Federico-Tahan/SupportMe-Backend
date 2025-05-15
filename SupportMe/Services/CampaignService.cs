@@ -82,6 +82,36 @@ namespace SupportMe.Services
             return response;
         }
 
+        public async Task<List<CampaignReadDTO>> GetMostRaisedCampaigns(string userId)
+        {
+            var campaignQuery = _context.Campaigns
+                                        .AsQueryable();
+
+            if (!userId.IsNullOrEmpty())
+            {
+                campaignQuery = campaignQuery.Where(x => x.UserId == userId);
+            }
+
+         
+            var response = new List<CampaignReadDTO>();
+            response = await campaignQuery
+                                    .Include(x => x.Category)
+                                    .Select(x => new CampaignReadDTO
+                                    {
+                                        Id = x.Id,
+                                        Category = x.Category != null ? x.Category.Name : null,
+                                        CreationDate = x.CreationDate,
+                                        Description = x.Description,
+                                        GoalAmount = x.GoalAmount,
+                                        GoalDate = x.GoalDate.HasValue ? DateHelper.GetDateInZoneTime(x.GoalDate.Value, "ARG", -180) : null,
+                                        MainImage = x.MainImage,
+                                        Name = x.Name,
+                                        Raised = _context.PaymentDetail.Where(c => c.Status == Status.OK && c.CampaignId == x.Id).Select(x => x.TotalPaidAmount).Sum(),
+                                        Tags = _context.CampaignTags.Where(c => c.CampaignId == x.Id).Select(x => x.Tag).ToList()
+                                    }).OrderBy(x => x.Raised).Take(5).ToListAsync();
+            return response;
+        }
+
         public async Task<List<SimpleCampaignRead>> GetSimpleCampaigns(string userId)
         {
             var campaignQuery = await _context.Campaigns

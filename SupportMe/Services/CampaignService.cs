@@ -265,6 +265,10 @@ namespace SupportMe.Services
                 {
                     campaignDB.GoalDate = DateHelper.GetUTCDateFromLocalDate(request.GoalDate.Value, "ARG", -180);
                 }
+                else 
+                {
+                    campaignDB.GoalDate = null;
+                }
                 campaignDB.GoalAmount = request.GoalAmount;
                 campaignDB.CategoryId = request.CategoryId;
                 var url = !string.IsNullOrWhiteSpace(request.MainImage) && !request.MainImage.IsUrl() &&

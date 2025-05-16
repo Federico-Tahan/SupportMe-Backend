@@ -381,6 +381,7 @@ namespace SupportMe.Services
                     Date = DateHelper.GetDateInZoneTime(x.PaymentDateUTC, "ARG", -180),
                     Comment = _context.PaymentComments.Where(c => c.PaymentId == x.Id).Select(c => c.Comment).FirstOrDefault()
                 })
+                .OrderBy(x => x.Date)
                 .Skip(skip)
                 .Take(take)
                 .ToListAsync();

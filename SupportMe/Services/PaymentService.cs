@@ -372,7 +372,7 @@ namespace SupportMe.Services
         public async Task<List<SimpleDonation>> GetDonationsByUser(string userId, int skip = 0, int take = 5)
         {
             var response = await _context.PaymentDetail.Include(x => x.Campaign).Where(x => x.UserId == userId)
-                .OrderBy(x => x.PaymentDateUTC)
+                .OrderByDescending(x => x.PaymentDateUTC)
                 .Select(x => new SimpleDonation 
                 { 
                     Amount = x.Amount, 

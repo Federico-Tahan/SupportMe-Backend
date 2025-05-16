@@ -372,6 +372,7 @@ namespace SupportMe.Services
         public async Task<List<SimpleDonation>> GetDonationsByUser(string userId, int skip = 0, int take = 5)
         {
             var response = await _context.PaymentDetail.Include(x => x.Campaign).Where(x => x.UserId == userId)
+                .OrderBy(x => x.PaymentDateUTC)
                 .Select(x => new SimpleDonation 
                 { 
                     Amount = x.Amount, 
@@ -380,8 +381,7 @@ namespace SupportMe.Services
                     DonatorName = x.CardHolderName,
                     Date = DateHelper.GetDateInZoneTime(x.PaymentDateUTC, "ARG", -180),
                     Comment = _context.PaymentComments.Where(c => c.PaymentId == x.Id).Select(c => c.Comment).FirstOrDefault()
-                })
-                .OrderBy(x => x.Date)
+                })            
                 .Skip(skip)
                 .Take(take)
                 .ToListAsync();

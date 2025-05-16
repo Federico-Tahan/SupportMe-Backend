@@ -134,34 +134,28 @@ namespace SupportMe.Services
                     .OrderByDescending(n => n.DateUtc)
                     .FirstOrDefaultAsync();
 
-                string nextNotification = null;
+                var milestones = new List<int> { 50, 75, 100 };
+                int? lastNotified = lastNotification != null ? int.Parse(lastNotification.NotificationType) : (int?)null;
 
-                if (percentageReached >= 100 && (lastNotification == null || lastNotification.NotificationType != "100"))
-                {
-                    nextNotification = "100";
-                }
-                else if (percentageReached >= 75 && (lastNotification == null || lastNotification.NotificationType != "75"))
-                {
-                    nextNotification = "75";
-                }
-                else if (percentageReached >= 50 && (lastNotification == null || lastNotification.NotificationType != "50"))
-                {
-                    nextNotification = "50";
-                }
+                int? nextMilestone = milestones
+                    .Where(m => percentageReached >= m && (lastNotified == null || m > lastNotified))
+                    .OrderByDescending(m => m)
+                    .FirstOrDefault();
 
-                if (nextNotification != null)
+                if (nextMilestone != null && nextMilestone != 0)
                 {
-                    // Guarda registro en CampaignNotification
+                    string nextNotification = nextMilestone.ToString();
+
                     var newNotification = new CampaignNotification
                     {
                         CampaignId = campaignId,
                         DateUtc = DateTime.UtcNow,
                         NotificationType = nextNotification
                     };
+
                     _context.CampaignNotification.Add(newNotification);
                     await _context.SaveChangesAsync();
 
-                    // Prepara y envía email
                     var emailDto = new EmailNotificationDTO
                     {
                         GoalAmount = goalAmount,

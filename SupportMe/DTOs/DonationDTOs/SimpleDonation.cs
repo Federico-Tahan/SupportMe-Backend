@@ -7,5 +7,6 @@
         public decimal Amount { get; set; }
         public string? CampaignName { get; set; }
         public string? Comment { get; set; }
+        public string? CampaignPic { get; set; }
     }
 }

@@ -376,6 +376,7 @@ namespace SupportMe.Services
                 { 
                     Amount = x.Amount, 
                     CampaignName = x.Campaign.Name, 
+                    CampaignPic = x.Campaign.MainImage,
                     DonatorName = x.CardHolderName,
                     Date = DateHelper.GetDateInZoneTime(x.PaymentDateUTC, "ARG", -180),
                     Comment = _context.PaymentComments.Where(c => c.PaymentId == x.Id).Select(c => c.Comment).FirstOrDefault()

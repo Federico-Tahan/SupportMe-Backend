@@ -62,8 +62,7 @@ namespace SupportMe.Services.Auth
         {
             try
             {
-                var fireBaseUser = await _firebaseHandler.Auth.TenantManager
-                                    .AuthForTenant(_configuration.GetValue<string>("TenantId"))
+                var fireBaseUser = await _firebaseHandler.Auth
                                         .UpdateUserAsync(new UserRecordArgs
                                         {
                                             Email = user.Email,

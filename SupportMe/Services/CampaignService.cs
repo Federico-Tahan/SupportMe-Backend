@@ -115,7 +115,7 @@ namespace SupportMe.Services
         public async Task<List<SimpleCampaignRead>> GetSimpleCampaigns(string userId)
         {
             var campaignQuery = await _context.Campaigns
-                                        .Where(x => x.UserId == userId && x.IsActive)
+                                        .Where(x => x.UserId == userId)
                                         .Select(x => new SimpleCampaignRead 
                                         {
                                             Name = x.Name,

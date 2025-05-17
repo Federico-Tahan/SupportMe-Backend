@@ -217,7 +217,6 @@ namespace SupportMe.Services
                 campaign.CreationDate = DateTime.Now;
                 campaign.Name = request.Name;
                 campaign.Description = request.Description;
-                campaign.IsActive = true;
                 if (request.GoalDate.HasValue)
                 {
                     campaign.GoalDate = DateHelper.GetUTCDateFromLocalDate(request.GoalDate.Value, "ARG", -180);

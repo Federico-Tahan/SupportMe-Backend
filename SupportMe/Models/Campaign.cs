@@ -1,10 +1,11 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using SupportMe.Models.Interface;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SupportMe.Models
 {
     [Table("Campaign")]
-    public class Campaign
+    public class Campaign : IsDeleted
     {
         [Key]
         public int Id { get; set; }
@@ -17,6 +18,7 @@ namespace SupportMe.Models
         public string UserId { get; set; }
         public int? CategoryId { get; set; }
         public bool IsActive { get; set; }
+        public bool IsDeleted { get; set; }
         [ForeignKey(nameof(CategoryId))]
         public virtual Category? Category { get; set; }
         [ForeignKey(nameof(UserId))]

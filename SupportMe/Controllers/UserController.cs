@@ -71,7 +71,7 @@ namespace SupportMe.Controllers
         }
 
 
-        [HttpPost("password/change")]
+        [HttpGet("password/change")]
         [AllowAnonymous]
         public async Task<IActionResult> ChangePassword([FromQuery] string token, [FromQuery] string newPassword)
         {

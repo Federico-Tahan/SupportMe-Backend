@@ -140,6 +140,7 @@ namespace SupportMe.Services
                                         GoalAmount = x.GoalAmount,
                                         GoalDate = x.GoalDate,
                                         MainImage = x.MainImage,
+                                        IsActive = x.IsActive,
                                         Name = x.Name,
                                         Views = _context.CampaignView.Where(c => c.CampaignId == x.Id).Count(),
                                         CategoryId = x.CategoryId,
@@ -223,6 +224,7 @@ namespace SupportMe.Services
                 }
                 campaign.GoalAmount = request.GoalAmount;
                 campaign.UserId = userId;
+                campaign.IsActive = request.IsActive;
                 campaign.CategoryId = request.CategoryId;
                 var url = !string.IsNullOrWhiteSpace(request.MainImage) && !request.MainImage.IsUrl() &&
                                         ImageHelper.ValidateImageFormat(request.MainImage) ?
@@ -299,6 +301,7 @@ namespace SupportMe.Services
                 {
                     campaignDB.GoalDate = null;
                 }
+                campaignDB.IsActive = request.IsActive;
                 campaignDB.GoalAmount = request.GoalAmount;
                 campaignDB.CategoryId = request.CategoryId;
                 var url = !string.IsNullOrWhiteSpace(request.MainImage) && !request.MainImage.IsUrl() &&

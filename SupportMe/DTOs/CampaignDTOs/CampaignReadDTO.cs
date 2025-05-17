@@ -11,6 +11,7 @@ namespace SupportMe.DTOs.CampaignDTOs
         public DateTime CreationDate { get; set; }
         public decimal? GoalAmount { get; set; }
         public DateTime? GoalDate { get; set; }
+        public bool IsActive { get; set; }
         public string Category { get; set; }
         public int Views { get; set; }
         public List<string> Tags { get; set; }

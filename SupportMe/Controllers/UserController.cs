@@ -62,6 +62,15 @@ namespace SupportMe.Controllers
             return Ok();
         }
 
+        [HttpGet("password/user/data")]
+        [AllowAnonymous]
+        public async Task<IActionResult> UserDateByToken([FromQuery] string token)
+        {
+            var user = await _userService.GetRecoveryDataUser(token);
+            return Ok(user);
+        }
+
+
         [HttpPost("password/change")]
         [AllowAnonymous]
         public async Task<IActionResult> ChangePassword([FromQuery] string token, [FromQuery] string newPassword)

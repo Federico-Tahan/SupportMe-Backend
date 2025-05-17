@@ -110,6 +110,27 @@ namespace SupportMe.Services
             return true;
         }
 
+
+        public async Task<RecoveryPasswordUserData> GetRecoveryDataUser(string token)
+        {
+
+            var decrypted = ForgotPasswordToken.Decrypt(System.Web.HttpUtility.UrlDecode(token), _configuration);
+            if (decrypted is null || decrypted.HasExpired())
+            {
+                throw new Exception("INVALID_TOKEN");
+            }
+
+            var user = await _context.Users.Where(x => x.Email == decrypted.Email)
+                .Select(x => new RecoveryPasswordUserData 
+                {
+                    Email = x.Email,
+                    FirstName = x.Name,
+                    LastName = x.LastName
+                }).FirstOrDefaultAsync();
+
+            return user;
+        }
+
         public async Task<SimpleUserInfo> GetProfile(string userId)
         {
             var user = await _context.Users.Where(x => x.Id == userId)

@@ -154,7 +154,7 @@ namespace SupportMe.Services
             {
                 var supportMessages = await _context.PaymentComments
                     .Join(_context.PaymentDetail, pc => pc.PaymentId, pd => pd.Id, (pc, pd) => new { PaymentDetail = pd, PaymentComment = pc })
-                    .Where(x => x.PaymentDetail.CampaignId == campaign.Id)
+                    .Where(x => x.PaymentDetail.CampaignId == campaign.Id && x.PaymentDetail.Status == Status.OK)
                     .Select(x => new SupportMessage 
                     {
                         Date = DateHelper.GetDateInZoneTime(x.PaymentDetail.PaymentDateUTC, "ARG", -180),

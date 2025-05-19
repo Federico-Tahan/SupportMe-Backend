@@ -158,7 +158,7 @@ namespace SupportMe.Services
 
             var token = new ForgotPasswordToken(email, TimeSpan.FromHours(1));
             string encrypted = token.Encrypt(_configuration);
-            _notificationService.ForgotPassword($"{user?.Name} {user?.LastName}", email, System.Web.HttpUtility.UrlEncode(encrypted));
+            _notificationService.ForgotPassword($"{user?.Name} {user?.LastName}", email, encrypted);
         }
         private string DecodeToken(string token)
         {

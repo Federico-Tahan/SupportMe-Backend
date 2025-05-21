@@ -26,6 +26,7 @@ namespace SupportMe.Services
             _minioClient = new MinioClient()
                 .WithEndpoint(endpoint)
                 .WithCredentials(accessKey, secretKey)
+                .WithSSL(true)
                 .Build();
             _configuration = configuration;
             _bucketName = _configuration.GetValue<string>("MINIO_BUCKET");

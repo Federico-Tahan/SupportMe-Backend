@@ -181,7 +181,7 @@ namespace SupportMe.Services
                 .WithStreamData(stream)
                 .WithObjectSize(stream.Length)
                 .WithContentType("image/jpeg"));
-            string publicUrl = $"https://supportme.site:9000/{_bucketName}/{fileName}";
+            string publicUrl = $"http://supportme.site:9000/{_bucketName}/{fileName}";
             return publicUrl;
         }
 

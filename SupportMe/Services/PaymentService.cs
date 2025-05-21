@@ -302,7 +302,7 @@ namespace SupportMe.Services
                 {
                     filter.Brand.Add("MASTER");
                     filter.Brand.Add("DEBMASTER");
-                } else if (filter.Brand.Any(x => x.Equals("Mastercard", StringComparison.OrdinalIgnoreCase))) 
+                } else if (filter.Brand.Any(x => x.Equals("visa", StringComparison.OrdinalIgnoreCase))) 
                 {
                     filter.Brand.Add("DEBVISA");
                     filter.Brand.Add("VISA");

@@ -19,6 +19,8 @@ using Microsoft.IdentityModel.Tokens;
 using System.Security.Cryptography;
 using SupportMe.Services.Auth;
 using SixLabors.ImageSharp;
+using Microsoft.Extensions.Options;
+using SupportMe.DTOs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -119,7 +121,16 @@ builder.Services
                     };
                 });
 
+builder.Services.Configure<MinioSettings>(builder.Configuration.GetSection("Minio"));
 
+builder.Services.AddSingleton<MinioFileUploadService>(sp =>
+{
+    var config = sp.GetRequiredService<IConfiguration>();
+    var endpoint = config.GetValue<string>("Minio:Endpoint");
+    var accessKey = config.GetValue<string>("Minio:AccessKey");
+    var secretKey = config.GetValue<string>("Minio:SecretKey");
+    return new MinioFileUploadService(endpoint, accessKey, secretKey, config);
+});
 
 /* ################################################### */
 /* ################    SERVICES     ################## */

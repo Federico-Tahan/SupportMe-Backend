@@ -17,14 +17,16 @@ namespace SupportMe.Services
         private readonly DataContext _context;
         private readonly IMapper _mapper;
         private readonly FileUploadService _fileUploadService;
+        private readonly MinioFileUploadService _minioFileUploadService;
         private const string Colacion = "SQL_Latin1_General_CP1_CI_AI";
         private readonly S3BucketConfig _S3BucketConfig;
-        public CampaignService(DataContext context, IMapper mapper, FileUploadService fileUpload, S3BucketConfig s3)
+        public CampaignService(DataContext context, IMapper mapper, FileUploadService fileUpload, S3BucketConfig s3, MinioFileUploadService minioFileUploadService)
         {
             _context = context;
             _mapper = mapper;
             _fileUploadService = fileUpload;
             _S3BucketConfig = s3;
+            _minioFileUploadService = minioFileUploadService;
         }
 
         public async Task<PaginationDTO<CampaignReadDTO>> GetCampaigns(CampaignFilter filter, string? userId) 
@@ -207,7 +209,7 @@ namespace SupportMe.Services
             pagination.TotalRegisters = count;
             return pagination;
         }
-        public async Task<string> CreateCampaign(CampaignWriteDTO request, string userId) 
+        public async Task<string> CreateCampaign(CampaignWriteDTO request, string userId)
         {
             using var transaction = await _context.Database.BeginTransactionAsync();
 
@@ -225,10 +227,14 @@ namespace SupportMe.Services
                 campaign.UserId = userId;
                 campaign.IsActive = request.IsActive;
                 campaign.CategoryId = request.CategoryId;
-                var url = !string.IsNullOrWhiteSpace(request.MainImage) && !request.MainImage.IsUrl() &&
-                                        ImageHelper.ValidateImageFormat(request.MainImage) ?
-                                        await _fileUploadService.ProcessImageUrl(_S3BucketConfig.Bucket, _S3BucketConfig.CdnUrl, request.MainImage, resizeToMultipleSizes: false) :
-                                        request.MainImage;
+
+                string url = request.MainImage;
+                if (!string.IsNullOrWhiteSpace(request.MainImage) && !request.MainImage.IsUrl() &&
+                    ImageHelper.ValidateImageFormat(request.MainImage))
+                {
+                    string fileName = $"campaigns/{Guid.NewGuid()}.jpg"; // o extraer la extensión real
+                    url = await _minioFileUploadService.UploadImageToMinioAsync(request.MainImage, fileName);
+                }
                 campaign.MainImage = url;
 
                 if (!request.Tags.IsNullOrEmpty())
@@ -241,20 +247,25 @@ namespace SupportMe.Services
                 _context.Add(campaign);
                 await _context.SaveChangesAsync();
 
-
                 if (request.Assets?.Count > 0)
                 {
                     List<GaleryAssets> assets = new List<GaleryAssets>();
                     foreach (var item in request.Assets)
                     {
-                        GaleryAssets assetsItem = new GaleryAssets();
-                        var imageUrl = !string.IsNullOrWhiteSpace(item.Base64) && !item.Base64.IsUrl() &&
-                                        ImageHelper.ValidateImageFormat(item.Base64) ?
-                                        await _fileUploadService.ProcessImageUrl(_S3BucketConfig.Bucket, _S3BucketConfig.CdnUrl, item.Base64, resizeToMultipleSizes: false) :
-                                        item.Base64;
-                        assetsItem.AssetSoruceId = campaign.Id.ToString();
-                        assetsItem.AssetSource = "CAMPAIGN";
-                        assetsItem.Asset = imageUrl;
+                        var imageUrl = item.Base64;
+                        if (!string.IsNullOrWhiteSpace(item.Base64) && !item.Base64.IsUrl() &&
+                            ImageHelper.ValidateImageFormat(item.Base64))
+                        {
+                            string fileName = $"campaigns/assets/{Guid.NewGuid()}.jpg";
+                            imageUrl = await _minioFileUploadService.UploadImageToMinioAsync(item.Base64, fileName);
+                        }
+
+                        GaleryAssets assetsItem = new GaleryAssets
+                        {
+                            AssetSoruceId = campaign.Id.ToString(),
+                            AssetSource = "CAMPAIGN",
+                            Asset = imageUrl
+                        };
 
                         assets.Add(assetsItem);
                     }
@@ -266,13 +277,13 @@ namespace SupportMe.Services
 
                 return url;
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 await transaction.RollbackAsync();
-
-                throw ex;
+                throw;
             }
         }
+
 
         public async Task View(int campaignId)
         {
@@ -290,24 +301,33 @@ namespace SupportMe.Services
             try
             {
                 var campaignDB = await _context.Campaigns.FirstOrDefaultAsync(x => x.Id == request.Id.Value && x.UserId == userId);
+                if (campaignDB == null)
+                    throw new Exception("Campaign not found or access denied");
+
                 campaignDB.Name = request.Name;
                 campaignDB.Description = request.Description;
                 if (request.GoalDate.HasValue)
                 {
                     campaignDB.GoalDate = DateHelper.GetUTCDateFromLocalDate(request.GoalDate.Value, "ARG", -180);
                 }
-                else 
+                else
                 {
                     campaignDB.GoalDate = null;
                 }
                 campaignDB.IsActive = request.IsActive;
                 campaignDB.GoalAmount = request.GoalAmount;
                 campaignDB.CategoryId = request.CategoryId;
-                var url = !string.IsNullOrWhiteSpace(request.MainImage) && !request.MainImage.IsUrl() &&
-                                        ImageHelper.ValidateImageFormat(request.MainImage) ?
-                                        await _fileUploadService.ProcessImageUrl(_S3BucketConfig.Bucket, _S3BucketConfig.CdnUrl, request.MainImage, resizeToMultipleSizes: false) :
-                                        request.MainImage;
+
+                string url = request.MainImage;
+                if (!string.IsNullOrWhiteSpace(request.MainImage) && !request.MainImage.IsUrl() &&
+                    ImageHelper.ValidateImageFormat(request.MainImage))
+                {
+                    string fileName = $"campaigns/{Guid.NewGuid()}.jpg"; // o extraer extensión real si se quiere
+                    url = await _minioFileUploadService.UploadImageToMinioAsync(request.MainImage, fileName);
+                }
                 campaignDB.MainImage = url;
+
+                // Borramos los tags existentes
                 await _context.CampaignTags.Where(x => x.CampaignId == campaignDB.Id).ExecuteDeleteAsync();
 
                 if (!request.Tags.IsNullOrEmpty())
@@ -320,6 +340,7 @@ namespace SupportMe.Services
                 _context.Update(campaignDB);
                 await _context.SaveChangesAsync();
 
+                // Borramos assets existentes
                 await _context.GaleryAssets.Where(x => x.AssetSource == "CAMPAIGN" && x.AssetSoruceId == campaignDB.Id.ToString()).ExecuteDeleteAsync();
 
                 if (request.Assets?.Count > 0)
@@ -327,14 +348,20 @@ namespace SupportMe.Services
                     List<GaleryAssets> assets = new List<GaleryAssets>();
                     foreach (var item in request.Assets)
                     {
-                        GaleryAssets assetsItem = new GaleryAssets();
-                        var imageUrl = !string.IsNullOrWhiteSpace(item.Base64) && !item.Base64.IsUrl() &&
-                                        ImageHelper.ValidateImageFormat(item.Base64) ?
-                                        await _fileUploadService.ProcessImageUrl(_S3BucketConfig.Bucket, _S3BucketConfig.CdnUrl, item.Base64, resizeToMultipleSizes: false) :
-                                        item.Base64;
-                        assetsItem.AssetSoruceId = campaignDB.Id.ToString();
-                        assetsItem.AssetSource = "CAMPAIGN";
-                        assetsItem.Asset = imageUrl;
+                        var imageUrl = item.Base64;
+                        if (!string.IsNullOrWhiteSpace(item.Base64) && !item.Base64.IsUrl() &&
+                            ImageHelper.ValidateImageFormat(item.Base64))
+                        {
+                            string fileName = $"campaigns/assets/{Guid.NewGuid()}.jpg";
+                            imageUrl = await _minioFileUploadService.UploadImageToMinioAsync(item.Base64, fileName);
+                        }
+
+                        GaleryAssets assetsItem = new GaleryAssets
+                        {
+                            AssetSoruceId = campaignDB.Id.ToString(),
+                            AssetSource = "CAMPAIGN",
+                            Asset = imageUrl
+                        };
 
                         assets.Add(assetsItem);
                     }
@@ -346,11 +373,10 @@ namespace SupportMe.Services
 
                 return url;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 await transaction.RollbackAsync();
-
-                throw ex;
+                throw;
             }
         }
     }

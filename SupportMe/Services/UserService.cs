@@ -13,6 +13,7 @@ using SupportMe.Services.Email;
 using SupportMe.Services.Email.Views;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Web;
 
 namespace SupportMe.Services
 {
@@ -97,7 +98,7 @@ namespace SupportMe.Services
         public async Task<bool> ChangePassword(string token, string password)
         {
 
-            var decrypted = ForgotPasswordToken.Decrypt(System.Web.HttpUtility.UrlDecode(token), _configuration);
+            var decrypted = ForgotPasswordToken.Decrypt(token, _configuration);
             if (decrypted is null || decrypted.HasExpired()) 
             {
                 return false;
@@ -114,7 +115,7 @@ namespace SupportMe.Services
         public async Task<RecoveryPasswordUserData> GetRecoveryDataUser(string token)
         {
 
-            var decrypted = ForgotPasswordToken.Decrypt(System.Web.HttpUtility.UrlDecode(token), _configuration);
+            var decrypted = ForgotPasswordToken.Decrypt(token, _configuration);
             if (decrypted is null || decrypted.HasExpired())
             {
                 throw new Exception("INVALID_TOKEN");
@@ -157,7 +158,7 @@ namespace SupportMe.Services
             if (user == null) return;
 
             var token = new ForgotPasswordToken(email, TimeSpan.FromHours(1));
-            string encrypted = token.Encrypt(_configuration);
+            string encrypted = HttpUtility.UrlEncode(token.Encrypt(_configuration));
             _notificationService.ForgotPassword($"{user?.Name} {user?.LastName}", email, encrypted);
         }
         private string DecodeToken(string token)

@@ -7,6 +7,7 @@ using Microsoft.Win32;
 using SixLabors.ImageSharp;
 using SupportMe.Data;
 using SupportMe.DTOs.UserDTOs;
+using SupportMe.Helpers;
 using SupportMe.Models;
 using SupportMe.Services.Auth;
 using SupportMe.Services.Email;
@@ -144,8 +145,8 @@ namespace SupportMe.Services
                     Name = x.Name,
                     ProfilePic = x.ProfilePic,
                     DonationsCount = _context.PaymentDetail.Where(c => c.UserId == x.Id && c.Status == Status.OK).Count(),
-                    TotalDonated = _context.PaymentDetail.Where(c => c.UserId == x.Id && c.Status == Status.OK).Sum(x => x.Amount)
-
+                    TotalDonated = _context.PaymentDetail.Where(c => c.UserId == x.Id && c.Status == Status.OK).Sum(x => x.Amount),
+                    CreatedDate = DateHelper.GetDateInZoneTime(x.CreatedDateUTC, "ARG", -180)
                 })
                 .FirstOrDefaultAsync();
 

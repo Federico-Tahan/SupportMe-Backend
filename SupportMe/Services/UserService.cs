@@ -52,6 +52,7 @@ namespace SupportMe.Services
                 var user = _mapper.Map<User>(request);
                 user.Name = request.FirstName;
                 user.Id = Guid.NewGuid().ToString();
+                user.CreatedDateUTC = DateTime.UtcNow;
                 _context.Add(user);
                 await _context.SaveChangesAsync();
 

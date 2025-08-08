@@ -64,7 +64,7 @@ namespace SupportMe.Services
             DateTime? to = null;
             DateHelper.SetUTCFromToDate(filter.From, filter.To, out from, out to, "ARG", -180);
 
-            var query = _context.PaymentDetail.Where(x => x.Campaign.UserId == userId && x.Status == Models.Status.OK);
+            var query = _context.PaymentDetail.Where(x => x.Campaign.UserId == userId && x.CampaignId == filter.CampaignId && x.Status == Models.Status.OK);
             var campaign = await _context.Campaigns.Where(x => x.Id == filter.CampaignId && x.UserId == userId).FirstOrDefaultAsync();
 
             if (from.HasValue)
